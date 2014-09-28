@@ -22,15 +22,32 @@ if [ "$(whoami)" != 'root' ]; then
   exit 1
 fi
 
+OS="$(uname -s)"
+case "${OS}" in
+  Darwin)
+    setup_for_mac
+    ;;
+  Linux)
+    if ! type git >/dev/null 2>/dev/null; then
+      if type apt-get >/dev/null 2>/dev/null; then
+        apt-get -y install git
+      elif type yum >/dev/null 2>/dev/null; then
+        yum install git
+      else
+        echo 'git command is not found.'
+      fi
+    fi
+    setup_for_linux
+    ;;
+  *)
+    echo "Unsupported system: ${OS}" >&2
+    exit 1
+    ;;
+esac
+
 if [ -d '/usr/imos/bin' ]; then
   rm -r '/usr/imos/bin'
 fi
 mkdir -p '/usr/imos/bin'
 git clone --depth 1 'https://github.com/imos/bin' '/usr/imos/bin'
 
-OS="$(uname -s)"
-case "${OS}" in
-  Darwin) setup_for_mac;;
-  Linux)  setup_for_linux;;
-  *)      echo "Unsupported system: ${OS}" >&2; exit 1;;
-esac
