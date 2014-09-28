@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -e -u
+
+setup_for_mac() {
+  echo '/usr/imos/bin' > '/etc/path.d/imos-bin'
+}
+
+setup_for_linux() {
+  cat << 'EOF' > '/etc/profile.d/imos-bin.sh'
+if [[ "${PATH}" =~ (:|^)'/usr/imos/bin'(:|$) ]]; then
+  PATH="/usr/imos/bin:${PATH}"
+fi
+EOF
+  chmod +x '/etc/profile.d/imos-bin.sh'
+}
+
+if [ "$(whoami)" != 'root' ]; then
+  echo 'root privilege is required.'
+  exit 1
+fi
+
+if [ -d '/usr/imos/bin' ]; then
+  rm -r '/usr/imos/bin'
+fi
+mkdir -p '/usr/imos/bin'
+git clone --depth 1 'https://github.com/imos/bin' '/usr/imos/bin'
+
+OS="$(uname -s)"
+case "${OS}" in
+  Darwin) setup_for_mac;;
+  Linux)  setup_for_linux;;
+  *)      echo "Unsupported system: ${OS}" >&2; exit 1;;
+esac
