@@ -43,13 +43,26 @@ add_readme() {
 }
 
 main() {
+  local targets=()
   local target=''
   init_readme
   for target in *; do
     if [ -x "${target}" -a ! -d "${target}" ]; then
-      add_readme "${target}"
+      targets+=("${target}")
     fi
   done
+  local readme_all=''
+  for target in "${targets[@]}"; do
+    local readme="$(add_readme "${target}")"
+    local lines=()
+    func::trim readme
+    func::explode lines $'\n' "${readme}"
+    if [ "${#lines[*]}" -gt 1 ]; then
+      echo "* [${target}](#${target}) ... ${lines[1]}"
+    fi
+    readme_all+="${readme}"$'\n\n'
+  done
+  echo "${readme_all}"
 }
 
 main > "${FLAGS_output}"

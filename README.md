@@ -8,6 +8,8 @@ curl https://raw.githubusercontent.com/imos/bin/master/tool/setup | sudo bash
 ```
 
 ## Commands
+* [imofs](#imofs) ... imofs is a command-line tool to backup/restore files and services.
+* [imosh](#imosh) ... imos is a utility library for BASH.
 ### imofs
 imofs is a command-line tool to backup/restore files and services.
 
