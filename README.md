@@ -2,8 +2,10 @@
 bin directory used by imos.
 
 ## How to Install
-Install this repository to /usr/imos/bin and configure /Users/imos/google-cloud-sdk/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/bootstrap/bin:/bootstrap/bin/darwin:/bootstrap/bin/darwin-x86_64:/usr/local/Cellar/go/1.2.1/libexec/bin:
-
+Install this repository to /usr/imos/bin and configure ${PATH}:
+```sh
+curl https://raw.githubusercontent.com/imos/bin/master/tool/setup | sudo bash
+```
 
 ## Commands
 ### imofs
