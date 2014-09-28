@@ -62,6 +62,7 @@ main() {
     fi
     readme_all+="${readme}"$'\n\n'
   done
+  echo
   echo "${readme_all}"
 }
 
