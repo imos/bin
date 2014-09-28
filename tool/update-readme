@@ -28,8 +28,17 @@ add_readme() {
   local file="${1}"
 
   echo "### ${file}"
-  __imosh::show_usage \
-      --format=markdown --notitle --markdown_heading='##' "${file}"
+  if grep '^eval "\${IMOSH_INIT}"$' "${file}" >/dev/null; then
+    "./${file}" --help_format=markdown 2>&1 | while IFS= read -r line; do
+      case "${line}" in
+        '#'*) echo "###${line}";;
+        *)    echo "${line}";;
+      esac
+    done
+  else
+    __imosh::show_usage \
+        --format=markdown --notitle --markdown_heading='##' "${file}"
+  fi
   echo
 }
 

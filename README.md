@@ -36,6 +36,10 @@ imofs [options] command
     * Directories to backup/restore.  A directory should not end with "/".
 
 
+#### Options
+##### main options
+* --dry_run=false
+    * Show what would have been transferred. (Alias: --n)
 
 ### imosh
 imos is a utility library for BASH.
