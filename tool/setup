@@ -8,7 +8,7 @@ setup_for_mac() {
 
 setup_for_linux() {
   cat << 'EOF' > '/etc/profile.d/imos-bin.sh'
-if [[ "${PATH}" =~ (:|^)'/usr/imos/bin'(:|$) ]]; then
+if [[ ! "${PATH}" =~ (:|^)'/usr/imos/bin'(:|$) ]]; then
   PATH="/usr/imos/bin:${PATH}"
 fi
 EOF
