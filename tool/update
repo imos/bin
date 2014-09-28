@@ -1,10 +1,10 @@
 #!/bin/bash
 # Update scripts inside the bin directory.
-
+#
 # This script should not use imosh so that we can revert imosh even if imosh is
 # buggy.
 
-IMOS_GIT='https://github.com/imos'
+IMOS_GIT='https://raw.githubusercontent.com/imos'
 IMOS_GIST='https://gist.githubusercontent.com/imos'
 TARGETS=(
   "imosh@${IMOS_GIT}/imosh/master/imosh"
