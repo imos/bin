@@ -9,7 +9,7 @@ curl https://raw.githubusercontent.com/imos/bin/master/tool/setup | sudo bash
 
 ## Commands
 ### imofs
-A command-line tool to backup/restore files and services.
+imofs is a command-line tool to backup/restore files and services.
 
 This command is useful especially for programming contests giving an disk
 image, and imofs backs up the initial state and restores almost everything.
@@ -39,7 +39,7 @@ imofs [options] command
 #### Options
 ##### main options
 * --dry_run=false
-    * Show what would have been transferred. (Alias: --n)
+    * Show what will be copied. (Alias: --n)
 
 ### imosh
 imos is a utility library for BASH.

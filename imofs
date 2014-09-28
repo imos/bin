@@ -1,5 +1,5 @@
 #!/bin/bash
-# A command-line tool to backup/restore files and services.
+# imofs is a command-line tool to backup/restore files and services.
 #
 # This command is useful especially for programming contests giving an disk
 # image, and imofs backs up the initial state and restores almost everything.
@@ -23,9 +23,7 @@
 #       Directories to backup/restore.  A directory should not end with "/".
 
 source "$(dirname "${BASH_SOURCE}")"/imosh || exit 1
-
-DEFINE_bool dry_run --alias=n false 'Show what would have been transferred.'
-
+DEFINE_bool dry_run --alias=n false 'Show what will be copied.'
 eval "${IMOSH_INIT}"
 
 # Top directories to backup.
