@@ -1,14 +1,16 @@
 #!/bin/bash
-# Update scripts inside the bin directory.
-#
-# This script should not use imosh so that we can revert imosh even if imosh is
-# buggy.
+# Update README.md.
 
-README='README.md'
-cd "$(dirname "${BASH_SOURCE}")/.."
+source "$(dirname "${BASH_SOURCE}")/../imosh" || exit 1
+
+DEFINE_string output "$(dirname "${BASH_SOURCE}")/../README.md" \
+    'README file to output.'
+
+eval "${IMOSH_INIT}"
+
 
 init_readme() {
-  cat << 'EOM' > "${README}"
+  cat << 'EOM'
 # imos-bin
 bin directory used by imos.
 
@@ -25,23 +27,10 @@ EOM
 add_readme() {
   local file="${1}"
 
-  local usage=''
-  while IFS='' read line; do
-    case "${line}" in
-      '#!'*) continue;;
-      '# #'*) usage+="####${line:3}"$'\n';;
-      '# '*) usage+="${line:2}"$'\n';;
-      '#'*)  usage+="${line:1}"$'\n';;
-      *)     break;;
-    esac
-  done < "${file}"
-
-  if [ "${usage}" = '' ]; then
-    usage='No description.'
-  fi
-  echo "### ${file}" >> "${README}"
-  cat <<<"${usage}" >> "${README}"
-  echo >> "${README}"
+  echo "### ${file}"
+  __imosh::show_usage \
+      --format=markdown --notitle --markdown_heading='##' "${file}"
+  echo
 }
 
 main() {
@@ -54,4 +43,4 @@ main() {
   done
 }
 
-main
+main > "${FLAGS_output}"

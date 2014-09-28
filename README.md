@@ -21,16 +21,20 @@ backup/restore are specified as SERVICES.
 imofs [options] command
 ```
 
+
 #### Command
-- restore ... Restore files and services.
-- backup ... Backup files and services.
+* restore
+    * Restore files and services.
+* backup
+    * Backup files and services.
 
 #### Configuration
-- /backup/imofs/services ...
-      Services to backup/restore.  This file is updated when you call
+* /backup/imofs/services
+    * Services to backup/restore.  This file is updated when you call
       backup command.
-- /backup/imofs/targets ...
-      Directories to backup/restore.  A directory should not end with "/".
+* /backup/imofs/targets
+    * Directories to backup/restore.  A directory should not end with "/".
+
 
 
 ### imosh

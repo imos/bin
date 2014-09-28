@@ -6,20 +6,20 @@
 # Directories to backup/restore are specified as TARGETS, and services to
 # backup/restore are specified as SERVICES.
 #
-# # Usage
-# ```sh
-# imofs [options] command
-# ```
+# Usage:
+#     imofs [options] command
 #
-# # Command
-# - restore ... Restore files and services.
-# - backup ... Backup files and services.
+# Command:
+#   - restore
+#       Restore files and services.
+#   - backup
+#       Backup files and services.
 #
-# # Configuration
-# - /backup/imofs/services ...
+# Configurations:
+#   - /backup/imofs/services
 #       Services to backup/restore.  This file is updated when you call
 #       backup command.
-# - /backup/imofs/targets ...
+#   - /backup/imofs/targets
 #       Directories to backup/restore.  A directory should not end with "/".
 
 source "$(dirname "${BASH_SOURCE}")"/imosh || exit 1
