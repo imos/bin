@@ -11,6 +11,11 @@ curl https://raw.githubusercontent.com/imos/bin/master/tool/setup | sudo bash
 ### imofs
 A command-line tool to backup/restore files and services.
 
+This command is useful especially for programming contests giving an disk
+image, and imofs backs up the initial state and restores almost everything.
+Directories to backup/restore are specified as TARGETS, and services to
+backup/restore are specified as SERVICES.
+
 #### Usage
 ```sh
 imofs [options] command
@@ -19,11 +24,6 @@ imofs [options] command
 #### Command
 - restore ... Restore files and services.
 - backup ... Backup files and services.
-
-This command is useful especially for programming contests giving an disk
-image, and imofs backs up the initial state and restores almost everything.
-Directories to backup/restore are specified as TARGETS, and services to
-backup/restore are specified as SERVICES.
 
 #### Configuration
 - /backup/imofs/services ...
