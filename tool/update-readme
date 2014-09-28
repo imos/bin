@@ -8,7 +8,7 @@ README='README.md'
 cd "$(dirname "${BASH_SOURCE}")/.."
 
 init_readme() {
-  cat <<EOM > "${README}"
+  cat << 'EOM' > "${README}"
 # imos-bin
 bin directory used by imos.
 
