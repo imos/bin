@@ -28,7 +28,7 @@ imofs [options] command
 * backup
     * Backup files and services.
 
-#### Configuration
+#### Configurations
 * /backup/imofs/services
     * Services to backup/restore.  This file is updated when you call
       backup command.
