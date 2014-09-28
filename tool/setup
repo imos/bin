@@ -32,7 +32,7 @@ case "${OS}" in
       if type apt-get >/dev/null 2>/dev/null; then
         apt-get -y install git
       elif type yum >/dev/null 2>/dev/null; then
-        yum install git
+        yum -y install git
       else
         echo 'git command is not found.'
       fi
