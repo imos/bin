@@ -2,17 +2,19 @@
 
 set -e -u
 
+update_profile() {
+  grep -v 'usr/imos/bin' '/etc/profile' > '/tmp/profile'
+  echo 'if [[ ! "${PATH}" =~ (:|^)'\''/usr/imos/bin'\''(:|$) ]]; then export PATH="/usr/imos/bin:${PATH}"; fi' >> '/tmp/profile'
+  cat '/tmp/profile' > '/etc/profile'
+}
+
 setup_for_mac() {
-  echo '/usr/imos/bin' > '/etc/path.d/imos-bin'
+  echo '/usr/imos/bin' > '/etc/paths.d/imos-bin'
+  update_profile
 }
 
 setup_for_linux() {
-  cat << 'EOF' > '/etc/profile.d/imos-bin.sh'
-if [[ ! "${PATH}" =~ (:|^)'/usr/imos/bin'(:|$) ]]; then
-  PATH="/usr/imos/bin:${PATH}"
-fi
-EOF
-  chmod +x '/etc/profile.d/imos-bin.sh'
+  update_profile
 }
 
 if [ "$(whoami)" != 'root' ]; then
