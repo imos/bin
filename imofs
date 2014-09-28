@@ -1,0 +1,139 @@
+#!/bin/bash
+# A command-line tool to backup/restore files and services.
+# URL: https://gist.github.com/imos/b5a05461dfbe21ff71b9
+#
+# This command is useful especially for programming contests giving an disk
+# image, and imofs backs up the initial state and restores almost everything.
+# Directories to backup/restore are specified as TARGETS, and services to
+# backup/restore are specified as SERVICES.
+#
+# Configuration:
+#   - /backup/imofs/services ...
+#         Services to backup/restore.  This file is updated when you call
+#         backup command.
+#   - /backup/imofs/targets ...
+#         Directories to backup/restore.  A directory should not end with "/".
+
+set -e -u
+
+# Top directories to backup.
+TARGETS=(bin etc home lib lib64 local opt root sbin usr var)
+# Services to stop before operating.
+SERVICES=(mysqld)
+
+stop_services() {
+  for service in "${SERVICES[@]}" $(cat '/backup/imofs/services'); do
+    if service "${service}" status >/dev/null 2>/dev/null; then
+      ACTIVE_SERVICES+=("${service}")
+      echo "Stopping ${service}..." >&2
+      service "${service}" stop
+    fi
+  done
+}
+
+restart_services() {
+  local services=()
+  if [ "${#ACTIVE_SERVICES[*]}" -ne 0 ]; then
+    services+=("${ACTIVE_SERVICES[@]}")
+  fi
+  services+=($(cat '/backup/imofs/services'))
+  for service in "${services[@]}"; do
+    if ! service "${service}" status >/dev/null 2>/dev/null; then
+      echo "Starting ${service}..." >&2
+      service "${service}" start
+    fi
+  done
+}
+
+call_rsync() {
+  local rsync_options=(-av --delete)
+  if (( DRY_RUN )); then
+    rsync_options+=(--dry-run)
+  fi
+  rsync "${rsync_options[@]}" "$@"
+}
+
+imofs::restore() {
+  if [ ! -d "/backup" ]; then
+    echo 'There is no backup.' >&2
+    exit
+  fi
+  stop_services
+  for target in "${TARGETS[@]}"; do
+    if [ -d "/backup/${target}/" ]; then
+      call_rsync "/backup/${target}/" "/${target}/"
+    fi
+  done
+  restart_services
+}
+
+imofs::backup() {
+  mkdir -p /backup/imofs
+  echo 'Backing up services...' >&2
+  if (( ! DRY_RUN )); then
+    for service in "${SERVICES[@]}"; do
+      if service "${service}" status >/dev/null 2>/dev/null; then
+        echo "${service}" >>'/backup/imofs/services'
+      fi
+    done
+    sort '/backup/imofs/services' | uniq > '/backup/imofs/services.tmp'
+    cat '/backup/imofs/services.tmp' > '/backup/imofs/services'
+    rm '/backup/imofs/services.tmp'
+  fi
+  stop_services
+  for target in "${TARGETS[@]}"; do
+    if [ -d "/${target}" ]; then
+      call_rsync "/${target}/" "/backup/${target}/"
+    fi
+  done
+  restart_services
+}
+
+main() {
+  local command="$1"; shift
+
+  if [ -f '/backup/imofs/targets' ]; then
+    TARGETS+=($(cat '/backup/imofs/targets'))
+  fi
+  if type "imofs::${command}" >/dev/null 2>/dev/null; then
+    "imofs::${command}"
+  else
+    echo "No such command: ${command}" >&2
+    exit 1
+  fi
+}
+
+# Initialize variables.
+ACTIVE_SERVICES=()
+export IFS=' \t\n'
+DRY_RUN=0
+
+# Parse flags simply.
+if [ "$#" -ne 0 ]; then
+  ARGV=()
+  for arg in "$@"; do
+    case "${arg}" in
+      --dry-run|-n) DRY_RUN=1;;
+      *)            ARGV+=("${arg}");;
+    esac
+  done
+  set -- "${ARGV[@]}"
+fi
+
+if [ "$#" -eq 1 ] && [ "$1" != 'help' ]; then
+  main "$1"
+else
+  cat <<EOM >&2
+Usage: imofs [options] command
+
+Commands:
+  help - Show this message.
+  restore - Restore files and services.
+  backup - Backup files and services.
+
+Options:
+  --dry-run or -n
+      Show what would have been transferred.
+EOM
+  exit 1
+fi
