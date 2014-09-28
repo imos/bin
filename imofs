@@ -120,6 +120,10 @@ if [ "$#" -ne 0 ]; then
 fi
 
 if [ "$#" -eq 1 ] && [ "$1" != 'help' ]; then
+  if [ "$(whoami)" != 'root' ]; then
+    echo 'root privilege is required.' >&2
+    exit 1
+  fi
   main "$1"
 else
   cat <<EOM >&2
