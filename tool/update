@@ -8,39 +8,9 @@ IMOS_GIT='https://raw.githubusercontent.com/imos'
 IMOS_GIST='https://gist.githubusercontent.com/imos'
 TARGETS=(
   "imosh@${IMOS_GIT}/imosh/master/imosh"
-  "imofs@${IMOS_GIST}/b5a05461dfbe21ff71b9/raw/imofs"
 )
-README='README.md'
 
 cd "$(dirname "${BASH_SOURCE}")/.."
-
-init_readme() {
-  echo '# imos-bin' > "${README}"
-  echo 'bin directory used by imos.' >> "${README}"
-  echo >> "${README}"
-}
-
-add_readme() {
-  local file="${1}"
-
-  local usage=''
-
-  while IFS='' read line; do
-    case "${line}" in
-      '#!'*) continue;;
-      '# '*) usage+="${line:2}"$'\n';;
-      '#'*)  usage+="${line:1}"$'\n';;
-      *)     break;;
-    esac
-  done < "${file}"
-
-  if [ "${usage}" = '' ]; then
-    usage='No description.'
-  fi
-  echo "## ${file}" >> "${README}"
-  cat <<<"${usage}" >> "${README}"
-  echo >> "${README}"
-}
 
 update() {
   if [ "$#" -eq 2 ]; then
@@ -48,7 +18,6 @@ update() {
     local url="$2"
     curl "${url}" > "${command}"
     chmod +x "${command}"
-    add_readme "${command}"
   else
     echo 'update requires at least two arguments.' >&2
     exit 1

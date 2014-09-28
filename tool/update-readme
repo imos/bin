@@ -1,0 +1,48 @@
+#!/bin/bash
+# Update scripts inside the bin directory.
+#
+# This script should not use imosh so that we can revert imosh even if imosh is
+# buggy.
+
+README='README.md'
+cd "$(dirname "${BASH_SOURCE}")/.."
+
+init_readme() {
+  echo '# imos-bin' > "${README}"
+  echo 'bin directory used by imos.' >> "${README}"
+  echo >> "${README}"
+}
+
+add_readme() {
+  local file="${1}"
+
+  local usage=''
+  while IFS='' read line; do
+    case "${line}" in
+      '#!'*) continue;;
+      '# #'*) usage+="###${line:3}"$'\n';;
+      '# '*) usage+="${line:2}"$'\n';;
+      '#'*)  usage+="${line:1}"$'\n';;
+      *)     break;;
+    esac
+  done < "${file}"
+
+  if [ "${usage}" = '' ]; then
+    usage='No description.'
+  fi
+  echo "## ${file}" >> "${README}"
+  cat <<<"${usage}" >> "${README}"
+  echo >> "${README}"
+}
+
+main() {
+  local target=''
+  init_readme
+  for target in *; do
+    if [ -x "${target}" -a ! -d "${target}" ]; then
+      add_readme "${target}"
+    fi
+  done
+}
+
+main
