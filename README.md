@@ -1,11 +1,13 @@
 # imos-bin
 bin directory used by imos.
 
-## How to Install
+## How to Install/Update
 Install this repository to /usr/imos/bin and configure ${PATH}:
 ```sh
 curl https://raw.githubusercontent.com/imos/bin/master/tool/setup | sudo bash
 ```
+
+Note that you can run the command multiple times safely.
 
 ## Commands
 * [imofs](#imofs) ... imofs is a command-line tool to backup/restore files and services.
