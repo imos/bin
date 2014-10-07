@@ -23,6 +23,8 @@
 #       Directories to backup/restore.  A directory should not end with "/".
 
 source "$(dirname "${BASH_SOURCE}")"/imosh || exit 1
+DEFINE_string target_directory '' 'Directory to backup/restore.'
+DEFINE_string backup_directory '/backup' 'Directory to store backups.'
 DEFINE_bool dry_run --alias=n false 'Show what will be copied.'
 eval "${IMOSH_INIT}"
 
@@ -32,7 +34,8 @@ TARGETS=(bin etc home lib lib64 local opt root sbin usr var)
 SERVICES=(mysqld)
 
 stop_services() {
-  for service in "${SERVICES[@]}" $(cat '/backup/imofs/services'); do
+  for service in "${SERVICES[@]}" \
+      $(cat "${FLAGS_backup_directory}/imofs/services"); do
     if service "${service}" status >/dev/null 2>/dev/null; then
       ACTIVE_SERVICES+=("${service}")
       echo "Stopping ${service}..." >&2
@@ -46,7 +49,7 @@ restart_services() {
   if [ "${#ACTIVE_SERVICES[*]}" -ne 0 ]; then
     services+=("${ACTIVE_SERVICES[@]}")
   fi
-  services+=($(cat '/backup/imofs/services'))
+  services+=($(cat "${FLAGS_backup_directory}/imofs/services"))
   for service in "${services[@]}"; do
     if ! service "${service}" status >/dev/null 2>/dev/null; then
       echo "Starting ${service}..." >&2
@@ -64,36 +67,40 @@ call_rsync() {
 }
 
 imofs::restore() {
-  if [ ! -d "/backup" ]; then
+  if [ ! -d "${FLAGS_backup_directory}" ]; then
     echo 'There is no backup.' >&2
     exit
   fi
   stop_services
   for target in "${TARGETS[@]}"; do
-    if [ -d "/backup/${target}/" ]; then
-      call_rsync "/backup/${target}/" "/${target}/"
+    if [ -d "${FLAGS_backup_directory}/${target}/" ]; then
+      call_rsync "${FLAGS_backup_directory}/${target}/" \
+                 "${FLAGS_target_directory}/${target}/"
     fi
   done
   restart_services
 }
 
 imofs::backup() {
-  mkdir -p /backup/imofs
+  mkdir -p "${FLAGS_backup_directory}/imofs"
   echo 'Backing up services...' >&2
   if (( ! FLAGS_dry_run )); then
     for service in "${SERVICES[@]}"; do
       if service "${service}" status >/dev/null 2>/dev/null; then
-        echo "${service}" >>'/backup/imofs/services'
+        echo "${service}" >> "${FLAGS_backup_directory}/imofs/services"
       fi
     done
-    sort '/backup/imofs/services' | uniq > '/backup/imofs/services.tmp'
-    cat '/backup/imofs/services.tmp' > '/backup/imofs/services'
-    rm '/backup/imofs/services.tmp'
+    sort "${FLAGS_backup_directory}/imofs/services" | \
+        uniq > "${FLAGS_backup_directory}/imofs/services.tmp"
+    cat "${FLAGS_backup_directory}/imofs/services.tmp" \
+        > "${FLAGS_backup_directory}/imofs/services"
+    rm "${FLAGS_backup_directory}/imofs/services.tmp"
   fi
   stop_services
   for target in "${TARGETS[@]}"; do
-    if [ -d "/${target}" ]; then
-      call_rsync "/${target}/" "/backup/${target}/"
+    if [ -d "${FLAGS_target_directory}/${target}" ]; then
+      call_rsync "${FLAGS_target_directory}/${target}/" \
+                 "${FLAGS_backup_directory}/${target}/"
     fi
   done
   restart_services
@@ -102,8 +109,8 @@ imofs::backup() {
 main() {
   local command="$1"; shift
 
-  if [ -f '/backup/imofs/targets' ]; then
-    TARGETS+=($(cat '/backup/imofs/targets'))
+  if [ -f "${FLAGS_backup_directory}/imofs/targets" ]; then
+    TARGETS+=($(cat "${FLAGS_backup_directory}/imofs/targets"))
   fi
   if type "imofs::${command}" >/dev/null 2>/dev/null; then
     "imofs::${command}"
