@@ -1,7 +1,7 @@
 #!/bin/bash
 # imofs is a command-line tool to backup/restore files and services.
 #
-# This command is useful especially for programming contests giving an disk
+# This command is useful especially for programming contests giving a disk
 # image, and imofs backs up the initial state and restores almost everything.
 # Directories to backup/restore are specified as TARGETS, and services to
 # backup/restore are specified as SERVICES.
@@ -11,9 +11,15 @@
 #
 # Command:
 #   - restore
-#       Restore files and services.
+#       Restore files and services from FLAGS_backup_directory to
+#       FLAGS_target_directory.
 #   - backup
-#       Backup files and services.
+#       Backup files and services from FLAGS_target_directory to
+#       FLAGS_backup_directory.
+#   - deploy
+#       Restore files and services from FLAGS_backup_directory to
+#       FLAGS_target_directory, and deploy files from FLAGS_source_directory to
+#       FLAGS_target_directory.
 #
 # Configurations:
 #   - /backup/imofs/services
@@ -25,6 +31,7 @@
 source "$(dirname "${BASH_SOURCE}")"/imosh || exit 1
 DEFINE_string target_directory '' 'Directory to backup/restore.'
 DEFINE_string backup_directory '/backup' 'Directory to store backups.'
+DEFINE_string source_directory '.' 'Source directory to deploy from.'
 DEFINE_bool dry_run --alias=n false 'Show what will be copied.'
 eval "${IMOSH_INIT}"
 
@@ -59,11 +66,11 @@ restart_services() {
 }
 
 call_rsync() {
-  local rsync_options=(-av --delete)
+  local rsync_options=(rsync)
   if (( FLAGS_dry_run )); then
     rsync_options+=(--dry-run)
   fi
-  rsync "${rsync_options[@]}" "$@"
+  "${rsync_options[@]}" "$@"
 }
 
 imofs::restore() {
@@ -74,11 +81,11 @@ imofs::restore() {
   stop_services
   for target in "${TARGETS[@]}"; do
     if [ -d "${FLAGS_backup_directory}/${target}/" ]; then
-      call_rsync "${FLAGS_backup_directory}/${target}/" \
-                 "${FLAGS_target_directory}/${target}/"
+      call_rsync -av --delete \
+          "${FLAGS_backup_directory}/${target}/" \
+          "${FLAGS_target_directory}/${target}/"
     fi
   done
-  restart_services
 }
 
 imofs::backup() {
@@ -99,11 +106,25 @@ imofs::backup() {
   stop_services
   for target in "${TARGETS[@]}"; do
     if [ -d "${FLAGS_target_directory}/${target}" ]; then
-      call_rsync "${FLAGS_target_directory}/${target}/" \
-                 "${FLAGS_backup_directory}/${target}/"
+      call_rsync -av --delete \
+          "${FLAGS_target_directory}/${target}/" \
+          "${FLAGS_backup_directory}/${target}/"
     fi
   done
-  restart_services
+}
+
+imofs::deploy() {
+  imofs::restore
+  call_rsync -av "${FLAGS_source_directory}/" "${FLAGS_target_directory}/"
+  pushd "${FLAGS_target_directory}/"
+  if [ -f './deploy' ]; then
+    chmod +x './deploy'
+    ./deploy &
+    if ! wait $!; then
+      LOG ERROR 'deploy program failed.'
+    fi
+  fi
+  popd
 }
 
 main() {
@@ -114,6 +135,7 @@ main() {
   fi
   if type "imofs::${command}" >/dev/null 2>/dev/null; then
     "imofs::${command}"
+    restart_services
   else
     echo "No such command: ${command}" >&2
     exit 1

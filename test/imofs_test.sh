@@ -2,6 +2,7 @@ run() {
   bash "$(dirname "${BASH_SOURCE}")"/imofs.sh \
       --target_directory="${TARGET}" \
       --backup_directory="${BACKUP}" \
+      --source_directory="${SOURCE}" \
       --alsologtostderr="${FLAGS_alsologtostderr}" \
       --logtostderr="${FLAGS_logtostderr}" \
       "$@"
@@ -10,6 +11,7 @@ run() {
 test::imofs() {
   local TARGET="${TMPDIR}/imofs"
   local BACKUP="${TMPDIR}/imofs/backup"
+  local SOURCE="${TMPDIR}/imofs/repository"
 
   mkdir -p "${TARGET}/etc"
   echo 'aaa' > "${TARGET}/etc/aaa"
@@ -41,4 +43,15 @@ test::imofs() {
   EXPECT_EQ 'BBBBB' "$(cat "${BACKUP}/etc/bbb")"
   EXPECT_FALSE [ -f "${BACKUP}/etc/ccc" ]
   EXPECT_EQ 'mysqld' "$(cat "${BACKUP}/imofs/services")"
+
+  mkdir -p "${SOURCE}/etc"
+  echo 'AAAAA' > "${SOURCE}/etc/aaa"
+  { echo '#!/bin/bash'; echo 'touch etc/foo'; } > "${SOURCE}/deploy"
+
+  run deploy
+
+  EXPECT_EQ 'AAAAA' "$(cat "${TARGET}/etc/aaa")"
+  EXPECT_EQ 'BBBBB' "$(cat "${TARGET}/etc/bbb")"
+  EXPECT_FALSE [ -f "${TARGET}/etc/ccc" ]
+  EXPECT_TRUE [ -f "${TARGET}/etc/foo" ]
 }
