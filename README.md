@@ -1,6 +1,8 @@
 # imos-bin
 bin directory used by imos.
 
+This repository is tested on drone.io (https://drone.io/github.com/imos/bin).
+
 ## How to Install/Update
 Install this repository to /usr/imos/bin and configure ${PATH}:
 ```sh
