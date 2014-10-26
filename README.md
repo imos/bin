@@ -13,6 +13,7 @@ Note that you can run the command multiple times safely.
 
 ## Commands
 * [imofs](#imofs) ... imofs is a command-line tool to backup/restore files and services.
+* [imos-pokemon](#imos-pokemon) ... imos-pokemon prints the current volume's Pokémon name/ID.
 * [imosh](#imosh) ... imos is a utility library for BASH.
 
 ### imofs
@@ -59,6 +60,38 @@ imofs [options] command
     * Source directory to deploy from.
 * --target_directory=''
     * Directory to backup/restore.
+
+### imos-pokemon
+imos-pokemon prints the current volume's Pokémon name/ID.
+
+For Mac OSX, this command uses a disk volume's name to determine Pokémon
+ID.  For linux OS, this command uses a primary IP address.
+
+#### Usage
+```sh
+imos-pokemon [options]
+```
+
+
+#### Files
+* /tmp/POKEMON_NAME
+    * Cache file to store a Pokémon name.
+* ./data/pokemon.txt
+    * Mapping from Pokémon ID to Pokémon name.
+
+
+#### Options
+##### main options
+* --cache=true
+    * Use cache.
+* --cache_file='/tmp/POKEMON_NAME'
+    * File to cache a Pokémon name
+* --id=false
+    * Show pokemon ID instead.
+* --pokemon_error_level='ERROR'
+    * Error level used when resolution partially fails.
+* --pokemon_mapping_file='./data/pokemon.txt'
+    * File to map a Pokémon ID to a Pokémon name.
 
 ### imosh
 imos is a utility library for BASH.
