@@ -1,0 +1,110 @@
+#!/bin/bash
+# imos-pokemon prints the current volume's Pokémon name/ID.
+#
+# For Mac OSX, this command uses a disk volume's name to determine Pokémon
+# ID.  For linux OS, this command uses a primary IP address.
+#
+# Usage:
+#     imos-pokemon [options]
+#
+# Files:
+#   - /tmp/POKEMON_NAME
+#       Cache file to store a Pokémon name.
+#   - ./data/pokemon.txt
+#       Mapping from Pokémon ID to Pokémon name.
+
+source "$(dirname "${BASH_SOURCE}")"/imosh || exit 1
+DEFINE_bool cache true 'Use cache.'
+DEFINE_string cache_file '/tmp/POKEMON_NAME' \
+    'File to cache a Pokémon name'
+DEFINE_bool id false 'Show pokemon ID instead.'
+DEFINE_string pokemon_mapping_file \
+    "$(dirname "${BASH_SOURCE}")/data/pokemon.txt" \
+    'File to map a Pokémon ID to a Pokémon name.'
+DEFINE_string pokemon_error_level 'ERROR' \
+    'Error level used when resolution partially fails.'
+eval "${IMOSH_INIT}"
+
+pokemon::darwin::system_profiler() {
+  func::println \
+      "$(system_profiler -xml -detailLevel full SPSoftwareDataType |
+         plutil -extract '0._items.0.boot_volume' xml1 -o - - |
+         xpath '/plist/string/text()' 2>/dev/null)"
+}
+
+pokemon::darwin::diskutil() {
+  local device="$(df / | grep /dev/ | awk '{ print $1 }')"
+  func::println \
+      "$(diskutil info -plist "${device}" |
+         plutil -extract VolumeName xml1 -o - - |
+         xpath '/plist/string/text()' 2>/dev/null)"
+}
+
+pokemon::darwin::volume() {
+  cd /Volumes
+  for disk in *; do
+    if [ "$(readlink "${disk}")" = '/' ]; then
+      func::println "${disk}"
+      return
+    fi
+  done
+  return 1
+}
+
+pokemon::darwin() {
+  local commands=(
+      pokemon::darwin::system_profiler
+      pokemon::darwin::diskutil
+      pokemon::darwin::volume)
+
+  for command in "${commands[@]}"; do
+    local name="$("${command}")"
+    LOG INFO "${command} infers ${name}"
+    func::println "${name}"
+  done >"${TMPDIR}/commands.txt"
+  if [ "$(wc -l < "${TMPDIR}/commands.txt")" -ne 3 -o \
+       "$(uniq "${TMPDIR}/commands.txt" | wc -l)" -ne 1 ]; then
+    LOG "${FLAGS_pokemon_error_level}" 'some command failed.'
+    head -n 1 "${TMPDIR}/commands.txt"
+    return
+  fi
+  sort "${TMPDIR}/commands.txt" | uniq -c | sort -nr | \
+      awk '{ print $2 }' | head -n 1
+}
+
+pokemon::linux() {
+  case "$(hostname -i)" in
+    '153.121.64.206')
+      func::println 'Dunsparce';;
+    *)
+      LOG "${FLAGS_pokemon_error_level}" 'resolution failed.'
+      func::println 'Unown';;
+  esac
+}
+
+: "${POKEMON_NAME:=}"
+if (( FLAGS_cache )) && [ -f "${FLAGS_cache_file}" ]; then
+  func::file_get_contents POKEMON_NAME "${FLAGS_cache_file}"
+  func::trim POKEMON_NAME
+fi
+if [ "${POKEMON_NAME}" = '' ]; then
+  POKEMON_NAME="$(pokemon::"$(sub::strtolower "${UNAME}")")"
+  func::println "${POKEMON_NAME}" > "${FLAGS_cache_file}" || true
+fi
+LOG INFO "pokemon name is ${POKEMON_NAME}"
+
+POKEMON_ID="$(
+    grep "${POKEMON_NAME}\$" "${FLAGS_pokemon_mapping_file}" |
+    awk '{ print $1 }')"
+LOG INFO "pokemon ID is ${POKEMON_ID}"
+
+if (( FLAGS_id )); then
+  func::println "${POKEMON_ID}"
+else
+  func::println "${POKEMON_NAME}"
+fi
+
+if [ "${POKEMON_ID}" = '' -o \
+     "$(tr -d '[0-9]' <<<"${POKEMON_ID}")" != '' ]; then
+  exit 1
+fi
