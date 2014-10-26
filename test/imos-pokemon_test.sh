@@ -13,4 +13,8 @@ test::imos-pokemon() {
 
   EXPECT_EQ 'Dunsparce' "$(UNAME=Linux run)"
   EXPECT_EQ '206' "$(UNAME=Linux run --id)"
+
+  echo 'Pikachu' > "${TMPDIR}/POKEMON_NAME"
+  EXPECT_EQ 'Pikachu' "$(
+      UNAME=Darwin run --cache --cache_file="${TMPDIR}/POKEMON_NAME")"
 }
