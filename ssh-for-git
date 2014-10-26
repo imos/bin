@@ -1,0 +1,12 @@
+#!/bin/bash
+# ssh-for-git runs ssh especially for git.
+#
+# ssh-for-git uses the GIT_SSH_IDENTITY environment variable to specify an
+# identity file.  Plus, it specifies StrictHostKeyChecking=no so that git is
+# not blocked for known_hosts registration.
+#
+# CAVEAT:
+# GIT_SSH_IDENTITY must be specified as an environment variable.
+
+set -e -u
+ssh -i "${GIT_SSH_IDENTITY}" -o StrictHostKeyChecking=no "$@"

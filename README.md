@@ -15,6 +15,7 @@ Note that you can run the command multiple times safely.
 * [imofs](#imofs) ... imofs is a command-line tool to backup/restore files and services.
 * [imos-pokemon](#imos-pokemon) ... imos-pokemon prints the current volume's Pokémon name/ID.
 * [imosh](#imosh) ... imos is a utility library for BASH.
+* [ssh-for-git](#ssh-for-git) ... ssh-for-git runs ssh especially for git.
 
 ### imofs
 imofs is a command-line tool to backup/restore files and services.
@@ -95,5 +96,15 @@ imos-pokemon [options]
 
 ### imosh
 imos is a utility library for BASH.
+
+### ssh-for-git
+ssh-for-git runs ssh especially for git.
+
+ssh-for-git uses the GIT_SSH_IDENTITY environment variable to specify an
+identity file.  Plus, it specifies StrictHostKeyChecking=no so that git is
+not blocked for known_hosts registration.
+
+### CAVEAT
+GIT_SSH_IDENTITY must be specified as an environment variable.
 
 
