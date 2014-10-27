@@ -1,0 +1,55 @@
+#!/bin/bash
+# imos-passgen is a password generator.
+#
+# imos-passgen generates a password based on a master password and a domain, and
+# copies a password to the clip board if it is not from SSH.
+#
+# Usage:
+#     imos-passgen
+
+hash() {
+  local seed="${1}"
+  local hash="$(
+      tr -d '[:space:]' <<<"${seed}" | \
+      openssl md5 -binary | \
+      base64 | \
+      tr -d -c '[:alnum:]')"
+  echo "${hash:0:8}"
+}
+
+main() {
+  while :; do
+    IFS=$'\n' read -r -sp 'Master password: ' password
+    if [ ! -t 0 ]; then
+      break
+    fi
+    echo
+    read -p "Password hash is $(hash "${password}"). Right? [Y/n] " yesno
+    case "${yesno}" in
+      [Nn]*) continue;;
+      *) break;;
+    esac
+  done
+
+  read -p 'Domain: ' domain
+  domain="$(echo "${domain}" | tr '[A-Z]' '[a-z]')"
+  seed="${password}@${domain}"
+
+  password="$(hash ${seed})"
+  if [ "${SSH_TTY+set}" == '' ]; then
+    if which pbcopy >/dev/null 2>/dev/null; then
+      echo -n "${password}" | pbcopy
+      echo 'Password was copied to your clipboard.'
+      exit 0
+    fi
+  fi
+
+  echo "${password}"
+}
+
+if [ "${#}" -eq 0 ]; then
+  main
+else
+  echo 'imos-passgen does not need arguments.' >&2
+  exit 1
+fi
