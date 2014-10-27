@@ -72,6 +72,8 @@ imos-passgen is a password generator.
 imos-passgen generates a password based on a master password and a domain, and
 copies a password to the clip board if it is not from SSH.
 
+Web interface version is available at: http://imoz.jp/password.html
+
 ### Usage
 ```sh
 imos-passgen
