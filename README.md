@@ -155,9 +155,7 @@ source imos-variables
 * IMOS_RESOURCE
     * IMOS_RESOURCE is a directory containing resource files for imos scripts.
       Its default value is an absolute path that is ../resource from the
-      directory that the imos-variables command exists.
-* IMOS_SESSION
-    * IMOS_SESSION is a temporary directory's absolute path.
+      directory where the imos-variables command exists.
 
 -----
 ### imosh
