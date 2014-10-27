@@ -13,6 +13,7 @@ Note that you can run the command multiple times safely.
 
 ## Commands
 * [imofs](#imofs) ... imofs is a command-line tool to backup/restore files and services.
+* [imos-passgen](#imos-passgen) ... imos-passgen is a password generator.
 * [imos-pokemon](#imos-pokemon) ... imos-pokemon prints the current volume's Pokémon name/ID.
 * [imosh](#imosh) ... imos is a utility library for BASH.
 * [ssh-for-git](#ssh-for-git) ... ssh-for-git runs ssh especially for git.
@@ -63,6 +64,18 @@ imofs [options] command
     * Source directory to deploy from.
 * --target_directory=''
     * Directory to backup/restore.
+
+-----
+### imos-passgen
+imos-passgen is a password generator.
+
+imos-passgen generates a password based on a master password and a domain, and
+copies a password to the clip board if it is not from SSH.
+
+### Usage
+```sh
+imos-passgen
+```
 
 -----
 ### imos-pokemon
