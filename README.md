@@ -12,11 +12,13 @@ curl https://raw.githubusercontent.com/imos/bin/master/tool/setup | sudo bash
 Note that you can run the command multiple times safely.
 
 ## Commands
-* [imofs](#imofs) ... imofs is a command-line tool to backup/restore files and services.
-* [imos-pokemon](#imos-pokemon) ... imos-pokemon prints the current volume's Pokémon name/ID.
-* [imosh](#imosh) ... imos is a utility library for BASH.
-* [ssh-for-git](#ssh-for-git) ... ssh-for-git runs ssh especially for git.
-* [stelnet](#stelnet) ... stelnet is an SSL client.
+* [imofs](#imofs) ... 
+* [imos-pokemon](#imos-pokemon) ... 
+* [imosh](#imosh) ... 
+* [ssh-for-git](#ssh-for-git) ... 
+* [stelnet](#stelnet) ... 
+
+-----
 
 ### imofs
 imofs is a command-line tool to backup/restore files and services.
@@ -63,6 +65,8 @@ imofs [options] command
 * --target_directory=''
     * Directory to backup/restore.
 
+-----
+
 ### imos-pokemon
 imos-pokemon prints the current volume's Pokémon name/ID.
 
@@ -95,8 +99,12 @@ imos-pokemon [options]
 * --pokemon_mapping_file='./data/pokemon.txt'
     * File to map a Pokémon ID to a Pokémon name.
 
+-----
+
 ### imosh
 imos is a utility library for BASH.
+
+-----
 
 ### ssh-for-git
 ssh-for-git runs ssh especially for git.
@@ -114,6 +122,8 @@ GIT_SSH=ssh-for-git GIT_SSH_IDENTITY=<identity file> \
 
 ### Caveat
 GIT_SSH_IDENTITY must be specified as an environment variable.
+
+-----
 
 ### stelnet
 stelnet is an SSL client.
