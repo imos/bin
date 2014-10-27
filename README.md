@@ -15,6 +15,8 @@ Note that you can run the command multiple times safely.
 * [imofs](#imofs) ... imofs is a command-line tool to backup/restore files and services.
 * [imos-passgen](#imos-passgen) ... imos-passgen is a password generator.
 * [imos-pokemon](#imos-pokemon) ... imos-pokemon prints the current volume's Pokémon name/ID.
+* [imos-start](#imos-start) ... imos-start is a start-up script.
+* [imos-variables](#imos-variables) ... imos-variables is a source file initializing variables.
 * [imosh](#imosh) ... imos is a utility library for BASH.
 * [ssh-for-git](#ssh-for-git) ... ssh-for-git runs ssh especially for git.
 * [stelnet](#stelnet) ... stelnet is an SSL client.
@@ -111,6 +113,51 @@ imos-pokemon [options]
     * Error level used when resolution partially fails.
 * --pokemon_mapping_file='./data/pokemon.txt'
     * File to map a Pokémon ID to a Pokémon name.
+
+-----
+### imos-start
+imos-start is a start-up script.
+
+imos-start is a script that should run just after boot programs.  This script
+requires the root privilege.
+
+#### Usage
+```sh
+imos-start
+```
+
+
+
+#### Options
+##### main options
+* --storage_directory='/Volumes/Arceus'
+    * Directory to be used as a storage directory.
+
+-----
+### imos-variables
+imos-variables is a source file initializing variables.
+
+imos-variables initializes variables.  Thus, imos-variables must be called
+using the source built-in command.  This command prepends the bin directory
+where imos-variables exists to the PATH environment vairable.
+
+### Usage
+```sh
+source imos-variables
+```
+
+
+### Variables
+* IMOS_STORAGE
+    * IMOS_STORAGE is a persistent directory's absolute path.  Its default
+      value is /Volumes/Arceus in Mac OSX and /storage in other operating
+      systems.
+* IMOS_RESOURCE
+    * IMOS_RESOURCE is a directory containing resource files for imos scripts.
+      Its default value is an absolute path that is ../resource from the
+      directory that the imos-variables command exists.
+* IMOS_SESSION
+    * IMOS_SESSION is a temporary directory's absolute path.
 
 -----
 ### imosh
