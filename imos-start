@@ -1,0 +1,43 @@
+#!/bin/bash
+# imos-start is a start-up script.
+#
+# imos-start is a script that should run just after boot programs.  This script
+# requires the root privilege.
+#
+# Usage:
+#     imos-start
+
+source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
+DEFINE_string storage_directory '/Volumes/Arceus' \
+    'Directory to be used as a storage directory.'
+eval "${IMOSH_INIT}"
+
+POKEMON="$(imos-pokemon --nocache)"
+
+check() {
+  if [ "$(whoami)" != 'root' ]; then
+    LOG FATAL 'root privilege is required'
+  fi
+}
+
+start::darwin() {
+  scutil --set ComputerName "${POKEMON}"
+  scutil --set LocalHostName "${POKEMON}"
+  scutil --set HostName "${POKEMON}.local"
+}
+
+start::linux() {
+  # There is nothing to do for linux.
+  :
+}
+
+main() {
+  check
+  "start::$(sub::strtolower "${UNAME}")"
+}
+
+if [ "${#}" -eq 0 ]; then
+  main
+else
+  LOG FATAL "imos-start requires no arguments."
+fi

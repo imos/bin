@@ -1,6 +1,7 @@
 run() {
   bash "$(dirname "${BASH_SOURCE}")"/imos-pokemon.sh \
       --nocache \
+      --cache_file= \
       --pokemon_error_level=FATAL \
       --alsologtostderr="${FLAGS_alsologtostderr}" \
       --logtostderr="${FLAGS_logtostderr}" \

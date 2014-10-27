@@ -89,7 +89,11 @@ if (( FLAGS_cache )) && [ -f "${FLAGS_cache_file}" ]; then
 fi
 if [ "${POKEMON_NAME}" = '' ]; then
   POKEMON_NAME="$(pokemon::"$(sub::strtolower "${UNAME}")")"
-  func::println "${POKEMON_NAME}" > "${FLAGS_cache_file}" || true
+  if [ "${FLAGS_cache_file}" != '' ]; then
+    if [ ! -f "${FLAGS_cache_file}" ]; then
+      func::println "${POKEMON_NAME}" > "${FLAGS_cache_file}" || true
+    fi
+  fi
 fi
 LOG INFO "pokemon name is ${POKEMON_NAME}"
 

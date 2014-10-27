@@ -1,0 +1,45 @@
+#!/bin/bash
+# imos-variables is a source file initializing variables.
+#
+# imos-variables initializes variables.  Thus, imos-variables must be called
+# using the source built-in command.  This command prepends the bin directory
+# where imos-variables exists to the PATH environment vairable.
+#
+# Usage:
+#     source imos-variables
+#
+# Variables:
+#   - IMOS_STORAGE
+#       IMOS_STORAGE is a persistent directory's absolute path.  Its default
+#       value is /Volumes/Arceus in Mac OSX and /storage in other operating
+#       systems.
+#   - IMOS_RESOURCE
+#       IMOS_RESOURCE is a directory containing resource files for imos scripts.
+#       Its default value is an absolute path that is ../resource from the
+#       directory that the imos-variables command exists.
+#   - IMOS_SESSION
+#       IMOS_SESSION is a temporary directory's absolute path.
+
+# Return if imos-variables is already loaded.
+if [ "${__IMOS_VARIABLES_IS_LOADED+loaded}" = 'loaded' ]; then return; fi
+__IMOS_VARIABLES_IS_LOADED=1
+source "$(dirname "${BASH_SOURCE}")"/imosh || exit 1
+
+export PATH="$(dirname "${BASH_SOURCE}"):${PATH}"
+
+if ! func::isset IMOS_STORAGE; then
+  if [ -d '/storage' ]; then
+    IMOS_STORAGE='/storage'
+  fi
+  if [ "${UNAME}" = 'Darwin' ]; then
+    if [ -d '/Volumes/Arceus' ]; then
+      IMOS_STORAGE='/Volumes/Arceus'
+    fi
+  fi
+fi
+
+if ! func::isset IMOS_RESOURCE; then
+  if [ -d "$(dirname "${BASH_SOURCE}")/../resource" ]; then
+    IMOS_RESOURCE="$(cd "$(dirname "${BASH_SOURCE}")/../resource"; pwd)"
+  fi
+fi
