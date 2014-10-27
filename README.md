@@ -16,6 +16,7 @@ Note that you can run the command multiple times safely.
 * [imos-pokemon](#imos-pokemon) ... imos-pokemon prints the current volume's Pokémon name/ID.
 * [imosh](#imosh) ... imos is a utility library for BASH.
 * [ssh-for-git](#ssh-for-git) ... ssh-for-git runs ssh especially for git.
+* [stelnet](#stelnet) ... stelnet is an SSL client.
 
 ### imofs
 imofs is a command-line tool to backup/restore files and services.
@@ -104,7 +105,37 @@ ssh-for-git uses the GIT_SSH_IDENTITY environment variable to specify an
 identity file.  Plus, it specifies StrictHostKeyChecking=no so that git is
 not blocked for known_hosts registration.
 
-### CAVEAT
+### Usage
+```sh
+GIT_SSH=ssh-for-git GIT_SSH_IDENTITY=<identity file> \
+    git <command>
+```
+
+
+### Caveat
 GIT_SSH_IDENTITY must be specified as an environment variable.
+
+### stelnet
+stelnet is an SSL client.
+
+stelnet is used to communicate wit hanother host using the SSL protocol.
+stelnet requires the openssl command. If port is not specified, 443 (HTTPS)
+is used.
+
+#### Usage
+```sh
+stelnet host [port]
+```
+
+
+
+#### Options
+##### main options
+* --crlf=true
+    * Use CRLF instead for new lines.
+* --debug=false
+    * Show debug information.
+* --ssl3=true
+    * Use SSL3.
 
 

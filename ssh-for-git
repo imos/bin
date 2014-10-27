@@ -5,7 +5,11 @@
 # identity file.  Plus, it specifies StrictHostKeyChecking=no so that git is
 # not blocked for known_hosts registration.
 #
-# CAVEAT:
+# Usage:
+#     GIT_SSH=ssh-for-git GIT_SSH_IDENTITY=<identity file> \
+#         git <command>
+#
+# Caveat:
 # GIT_SSH_IDENTITY must be specified as an environment variable.
 
 set -e -u

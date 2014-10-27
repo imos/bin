@@ -1,0 +1,38 @@
+#!/bin/bash
+# stelnet is an SSL client.
+#
+# stelnet is used to communicate wit hanother host using the SSL protocol.
+# stelnet requires the openssl command. If port is not specified, 443 (HTTPS)
+# is used.
+#
+# Usage:
+#     stelnet host [port]
+
+source "$(dirname "${BASH_SOURCE}")"/imosh || exit 1
+DEFINE_bool crlf true 'Use CRLF instead for new lines.'
+DEFINE_bool ssl3 true 'Use SSL3.'
+DEFINE_bool debug false 'Show debug information.'
+eval "${IMOSH_INIT}"
+
+main() {
+  local host="$1"
+  local port="$2"
+
+  local options=(-host "${host}" -port "${port}")
+  if (( FLAGS_crlf )); then options+=(-crlf); fi
+  if (( FLAGS_ssl3 )); then options+=(-ssl3); fi
+  if (( FLAGS_ssl3 )); then options+=(-ssl3); fi
+  if (( FLAGS_debug )); then
+    openssl s_client "${options[@]}"
+  else
+    openssl s_client -quiet "${options[@]}" 2>/dev/null
+  fi
+}
+
+if [ "${#}" -eq 2 ]; then
+  main "$@"
+elif [ "${#}" -eq 1 ]; then
+  main "$@" 443
+else
+  LOG FATAL 'stelnet requires one or two arguments.'
+fi
