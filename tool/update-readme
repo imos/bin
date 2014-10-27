@@ -31,9 +31,7 @@ EOM
 add_readme() {
   local file="${1}"
 
-  echo
   echo '-----'
-  echo
   echo "### ${file}"
   if grep '^eval "\${IMOSH_INIT}"$' "${file}" >/dev/null; then
     "./${file}" --help_format=markdown 2>&1 | while IFS= read -r line; do
@@ -64,8 +62,8 @@ main() {
     local lines=()
     func::trim readme
     func::explode lines $'\n' "${readme}"
-    if [ "${#lines[*]}" -gt 1 ]; then
-      echo "* [${target}](#${target}) ... ${lines[1]}"
+    if [ "${#lines[*]}" -gt 2 ]; then
+      echo "* [${target}](#${target}) ... ${lines[2]}"
     fi
     readme_all+="${readme}"$'\n\n'
   done
