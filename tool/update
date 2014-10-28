@@ -4,10 +4,10 @@
 # This script should not use imosh so that we can revert imosh even if imosh is
 # buggy.
 
-IMOS_GIT='https://raw.githubusercontent.com/imos'
-IMOS_GIST='https://gist.githubusercontent.com/imos'
+GIT_URL='https://raw.githubusercontent.com/imos'
 TARGETS=(
-  "imosh@${IMOS_GIT}/imosh/master/imosh"
+  "imosh@${GIT_URL}/imos/imosh/master/imosh"
+  "git-prompt.sh@${GIT_URL}/git/git/master/contrib/completion/git-prompt.sh"
 )
 
 cd "$(dirname "${BASH_SOURCE}")/.."
@@ -26,11 +26,15 @@ update() {
 
 main() {
   local target=''
-  init_readme
   for target in "${TARGETS[@]}"; do
     IFS='@' eval "local args=(\${target})"
+    if [ "${#}" -eq 1 ]; then
+      if [ "${1}" != "${args[0]}" ]; then
+        continue
+      fi
+    fi
     update "${args[@]}"
   done
 }
 
-main
+main "${@}"
