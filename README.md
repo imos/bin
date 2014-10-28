@@ -13,6 +13,7 @@ Note that you can run the command multiple times safely.
 
 ## Commands
 * [imofs](#imofs) ... imofs is a command-line tool to backup/restore files and services.
+* [imos-bashrc](#imos-bashrc) ... imos-bashrc is a bash init script.
 * [imos-passgen](#imos-passgen) ... imos-passgen is a password generator.
 * [imos-pokemon](#imos-pokemon) ... imos-pokemon prints the current volume's Pokémon name/ID.
 * [imos-start](#imos-start) ... imos-start is a start-up script.
@@ -66,6 +67,17 @@ imofs [options] command
     * Source directory to deploy from.
 * --target_directory=''
     * Directory to backup/restore.
+
+-----
+### imos-bashrc
+imos-bashrc is a bash init script.
+
+imos-bashrc initializes PS1 and sources init files.
+
+### Usage
+```sh
+source /usr/imos/bin/imos-bashrc
+```
 
 -----
 ### imos-passgen
