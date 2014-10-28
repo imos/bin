@@ -1,4 +1,10 @@
 #!/bin/bash
+# imos-bashrc is a bash init script.
+#
+# imos-bashrc initializes PS1 and sources init files.
+#
+# Usage:
+#     source /usr/imos/bin/imos-bashrc
 
 # Exit immediatelly if PS1 is not set.
 if [ "${PS1}" = '' ]; then return 2>&- || exit; fi
