@@ -4,7 +4,7 @@
 # This script should not use imosh so that we can revert imosh even if imosh is
 # buggy.
 
-GIT_URL='https://raw.githubusercontent.com/imos'
+GIT_URL='https://raw.githubusercontent.com'
 TARGETS=(
   "imosh@${GIT_URL}/imos/imosh/master/imosh"
   "git-prompt.sh@${GIT_URL}/git/git/master/contrib/completion/git-prompt.sh"
