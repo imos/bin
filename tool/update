@@ -7,7 +7,7 @@
 GIT_URL='https://raw.githubusercontent.com'
 TARGETS=(
   "imosh@${GIT_URL}/imos/imosh/master/imosh"
-  "git-prompt.sh@${GIT_URL}/git/git/master/contrib/completion/git-prompt.sh"
+  "library/git-prompt.sh@${GIT_URL}/git/git/master/contrib/completion/git-prompt.sh"
 )
 
 cd "$(dirname "${BASH_SOURCE}")/.."
