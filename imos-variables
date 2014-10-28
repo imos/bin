@@ -24,6 +24,7 @@ __IMOS_VARIABLES_IS_LOADED=1
 source "$(dirname "${BASH_SOURCE}")"/imosh || exit 1
 
 export PATH="$(dirname "${BASH_SOURCE}"):${PATH}"
+export POKEMON="$(imos-pokemon)"
 
 if ! func::isset IMOS_STORAGE; then
   if [ -d '/storage' ]; then
