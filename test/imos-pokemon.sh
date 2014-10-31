@@ -35,7 +35,7 @@ system_profiler() {
         <key>boot_mode</key>
         <string>normal_boot</string>
         <key>boot_volume</key>
-        <string>Moltres</string>
+        <string>Pikachu</string>
         <key>kernel_version</key>
         <string>Darwin 14.0.0</string>
         <key>local_host_name</key>
@@ -189,7 +189,7 @@ diskutil() {
   <key>JournalSize</key>
   <integer>8388608</integer>
   <key>MediaName</key>
-  <string>Moltres</string>
+  <string>Pikachu</string>
   <key>MediaType</key>
   <string>Generic</string>
   <key>MountPoint</key>
@@ -215,7 +215,7 @@ diskutil() {
   <key>VolumeAllocationBlockSize</key>
   <integer>4096</integer>
   <key>VolumeName</key>
-  <string>Moltres</string>
+  <string>Pikachu</string>
   <key>VolumeUUID</key>
   <string>1B66B181-9AA9-3478-A247-072F82162FD5</string>
   <key>WholeDisk</key>
@@ -231,6 +231,19 @@ diskutil() {
 EOM
   else
     LOG FATAL "Unknown flags: $*"
+  fi
+}
+
+readlink() {
+  if [ "${#}" -eq 1 ]; then
+    local path="$(pwd)/${1}"
+    if [ "${path}" = '/Volumes/Pikachu' ]; then
+      func::println '/'
+    else
+      func::println "${path}"
+    fi
+  else
+    LOG FATAL "Wrong number of arguments."
   fi
 }
 

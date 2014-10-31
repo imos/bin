@@ -42,7 +42,7 @@ pokemon::darwin::diskutil() {
 
 pokemon::darwin::volume() {
   cd /Volumes
-  for disk in *; do
+  for disk in * Pikachu; do
     if [ "$(readlink "${disk}")" = '/' ]; then
       func::println "${disk}"
       return
@@ -55,7 +55,8 @@ pokemon::darwin() {
   local commands=(
       pokemon::darwin::system_profiler
       pokemon::darwin::diskutil
-      pokemon::darwin::volume)
+      pokemon::darwin::volume
+  )
 
   for command in "${commands[@]}"; do
     local name="$("${command}")"
@@ -77,8 +78,15 @@ pokemon::linux() {
     '153.121.64.206')
       func::println 'Dunsparce';;
     *)
-      LOG "${FLAGS_pokemon_error_level}" 'resolution failed.'
-      func::println 'Unown';;
+      case "$(hostname -s)" in
+        'oddish-imos')
+          func::println 'Oddish';;
+        'cyndaquil-imos')
+          func::println 'Cyndaquil';;
+        *)
+          LOG "${FLAGS_pokemon_error_level}" 'resolution failed.'
+          func::println 'Unown';;
+      esac
   esac
 }
 

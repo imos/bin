@@ -11,8 +11,8 @@ run() {
 test::imos-pokemon() {
   # Test only when Darwin-specific commands exist.
   if [ "${UNAME}" = 'Darwin' ]; then
-    EXPECT_EQ 'Moltres' "$(UNAME=Darwin run)"
-    EXPECT_EQ '146' "$(UNAME=Darwin run --id)"
+    EXPECT_EQ 'Pikachu' "$(UNAME=Darwin run)"
+    EXPECT_EQ '25' "$(UNAME=Darwin run --id)"
   fi
 
   EXPECT_EQ 'Dunsparce' "$(UNAME=Linux run)"
