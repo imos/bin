@@ -56,7 +56,7 @@ imos-install::darwin() {
     case "${user}" in
       Guest|Shared|provision|ninetan) :;;
       *)
-        local owner="$(stat -f '%u:%g' "${user}")"
+        local owner="$(imos-stat --format='%u:%g' "${user}")"
         local storage_home="${IMOS_STORAGE}/home/${user}"
         mkdir -p "${storage_home}"
         chown "${owner}" "${storage_home}"

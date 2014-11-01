@@ -1,0 +1,19 @@
+#!/bin/bash
+
+source "$(dirname "${BASH_SOURCE}")"/imosh || exit 1
+DEFINE_bool use_native_uname true 'Use native UNAME instead.'
+DEFINE_string format '' 'Format.'
+eval "${IMOSH_INIT}"
+
+if (( FLAGS_use_native_uname )); then
+  UNAME="$(uname)"
+fi
+
+case "${UNAME}" in
+  Darwin)
+    stat -f "${FLAGS_format}" "$@";;
+  Linux)
+    stat --format "${FLAGS_format}" "$@";;
+  *)
+    LOG FATAL "Unsupported UNAME: ${UNAME}";;
+esac
