@@ -1,0 +1,95 @@
+#!/bin/bash
+# Usage:
+#     imos-install
+
+source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
+eval "${IMOSH_INIT}"
+
+POKEMON="$(imos-pokemon --nocache)"
+
+check() {
+  if [ "$(whoami)" != 'root' ]; then
+    LOG FATAL 'root privilege is required'
+  fi
+}
+
+backup_and_move() {
+  if [ "${#}" -eq 2 ]; then
+    local source="${1}"
+    local destination="${2}"
+    LOG INFO "Moving ${source} to ${destination}..."
+    if [ -L "${source}" ]; then
+      if [ "$(readlink "${source}")" != "${destination}" ]; then
+        rm "${source}"
+        ln -s "${destination}" "${source}"
+      else
+        LOG INFO 'There is nothing to do.'
+      fi
+    else
+      if [ -a "${source}" ]; then
+        if [ -a "${destination}" ]; then
+          mv "${destination}" "${destination}.$(date '+%Y%m%d-%H%M%S')"
+        fi
+        mkdir -p "$(dirname "${destination}")"
+        mv "${source}" "${destination}"
+      fi
+      ln -s "${destination}" "${source}"
+    fi
+  else
+    LOG FATAL "Wrong number of arguments."
+  fi
+}
+
+imos-install::darwin() {
+  if [ ! -L "${IMOS_STORAGE}" -a ! -a "${IMOS_STORAGE}" ]; then
+    LOG INFO ln -s '/Volumes/Arceus' "${IMOS_STORAGE}"
+    ln -s '/Volumes/Arceus' "${IMOS_STORAGE}"
+  fi
+  LOG INFO 'Preparing user files...'
+  pushd "${IMOS_USERS}" >/dev/null
+  local user=''
+  for user in *; do
+    case "${user}" in
+      Guest|Shared|provision|ninetan) :;;
+      *)
+        local owner="$(stat -f '%u:%g' "${user}")"
+        local storage_home="${IMOS_STORAGE}/home/${user}"
+        mkdir -p "${storage_home}"
+        chown "${owner}" "${storage_home}"
+        chmod 755 "${storage_home}"
+        local directories=(
+            '.dropbox' 'Desktop' 'Documents' 'Downloads' 'Dropbox'
+            'Movies' 'Music' 'Pictures')
+        local directory=''
+        for directory in "${directories[@]}"; do
+          backup_and_move "${user}/${directory}" "${storage_home}/${directory}"
+        done
+        local files=('.bash_history')
+        local file=''
+        for file in "${files[@]}"; do
+          backup_and_move "${user}/${file}" "${storage_home}/${file}"
+        done
+        backup_and_move "${user}/Library/Caches" \
+                        "${IMOS_STORAGE}/cache/Users/${user}/Library/Caches"
+    esac
+  done
+  popd >/dev/null
+  backup_and_move '/var/vm' "${IMOS_STORAGE}/cache/var/vm"
+  backup_and_move '/Library/Caches' "${IMOS_STORAGE}/cache/Library/Caches"
+}
+
+imos-install::linux() {
+  # There is nothing to do for linux.
+  :
+}
+
+main() {
+  check
+  "imos-install::$(sub::strtolower "${UNAME}")"
+}
+
+if [ "${#}" -eq 0 ]; then
+  main
+else
+  LOG FATAL "imos-install requires no arguments."
+fi

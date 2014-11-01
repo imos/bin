@@ -30,15 +30,18 @@ if ! func::isset IMOS_STORAGE; then
   if [ -d '/storage' ]; then
     IMOS_STORAGE='/storage'
   fi
-  if [ "${UNAME}" = 'Darwin' ]; then
-    if [ -d '/Volumes/Arceus' ]; then
-      IMOS_STORAGE='/Volumes/Arceus'
-    fi
-  fi
 fi
 
 if ! func::isset IMOS_RESOURCE; then
   if [ -d "$(dirname "${BASH_SOURCE}")/../resource" ]; then
     IMOS_RESOURCE="$(cd "$(dirname "${BASH_SOURCE}")/../resource"; pwd)"
   fi
+fi
+
+if ! func::isset IMOS_USERS; then
+  case "${UNAME}" in
+    Darwin) IMOS_USERS='/Users';;
+    Linux)  IMOS_USERS='/home';;
+    *)      IMOS_USERS='/home';;
+  esac
 fi

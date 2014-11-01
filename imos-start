@@ -8,8 +8,6 @@
 #     imos-start
 
 source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
-DEFINE_string storage_directory '/Volumes/Arceus' \
-    'Directory to be used as a storage directory.'
 eval "${IMOSH_INIT}"
 
 POKEMON="$(imos-pokemon --nocache)"
