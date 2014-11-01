@@ -26,10 +26,12 @@ source "$(dirname "${BASH_SOURCE}")"/imosh || exit 1
 export PATH="$(dirname "${BASH_SOURCE}"):${PATH}"
 export POKEMON="$(imos-pokemon)"
 
+if ! func::isset IMOS_ROOT; then
+  IMOS_ROOT=''
+fi
+
 if ! func::isset IMOS_STORAGE; then
-  if [ -d '/storage' ]; then
-    IMOS_STORAGE='/storage'
-  fi
+  IMOS_STORAGE="${IMOS_ROOT}/storage"
 fi
 
 if ! func::isset IMOS_RESOURCE; then
@@ -40,8 +42,8 @@ fi
 
 if ! func::isset IMOS_USERS; then
   case "${UNAME}" in
-    Darwin) IMOS_USERS='/Users';;
-    Linux)  IMOS_USERS='/home';;
-    *)      IMOS_USERS='/home';;
+    Darwin) IMOS_USERS="${IMOS_ROOT}/Users";;
+    Linux)  IMOS_USERS="${IMOS_ROOT}/home";;
+    *)      IMOS_USERS="${IMOS_ROOT}/home";;
   esac
 fi

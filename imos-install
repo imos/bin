@@ -33,7 +33,8 @@ backup_and_move() {
         mkdir -p "$(dirname "${destination}")"
         mv "${source}" "${destination}"
       fi
-      ln -s "${destination}" "${source}"
+      ln -s "${destination}" "${source}" || LOG ERROR \
+          "Failed to create a symbolic link: ${source} to ${destination}."
     fi
   else
     LOG FATAL "Wrong number of arguments."
@@ -42,8 +43,11 @@ backup_and_move() {
 
 imos-install::darwin() {
   if [ ! -L "${IMOS_STORAGE}" -a ! -a "${IMOS_STORAGE}" ]; then
-    LOG INFO ln -s '/Volumes/Arceus' "${IMOS_STORAGE}"
-    ln -s '/Volumes/Arceus' "${IMOS_STORAGE}"
+    local arceus="${IMOS_ROOT}/Volumes/Arceus"
+    if [ ! -d "${arceus}" ]; then
+      LOG FATAL "Arceus is not found: ${arceus}"
+    fi
+    ln -s "${arceus}" "${IMOS_STORAGE}"
   fi
   LOG INFO 'Preparing user files...'
   pushd "${IMOS_USERS}" >/dev/null
@@ -74,8 +78,9 @@ imos-install::darwin() {
     esac
   done
   popd >/dev/null
-  backup_and_move '/var/vm' "${IMOS_STORAGE}/cache/var/vm"
-  backup_and_move '/Library/Caches' "${IMOS_STORAGE}/cache/Library/Caches"
+  backup_and_move "${IMOS_ROOT}/var/vm" "${IMOS_STORAGE}/cache/var/vm"
+  backup_and_move "${IMOS_ROOT}/Library/Caches" \
+                  "${IMOS_STORAGE}/cache/Library/Caches"
 }
 
 imos-install::linux() {
