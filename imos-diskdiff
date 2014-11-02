@@ -1,0 +1,53 @@
+#!/bin/bash
+# imos-diskdiff compares disk volumes.
+#
+# imos-diskdiff compares disk volumes and list different files.
+#
+# Usage:
+#     imos-diskdiff
+
+source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
+eval "${IMOSH_INIT}"
+
+EXCLUDES=(
+    /.fseventsd/
+    /.Spotlight-V100/
+    /.Trashes/
+    /.VolumeIcon.icns
+    /dev/
+    /net/
+    /private/tmp/
+    /private/var/folders/
+    /private/var/log/
+    /private/var/root/
+    /private/var/run/
+    /private/var/spool/cups/
+    /private/var/spool/postfix/
+    /private/var/tmp/
+    /System/Library/Caches/
+    /tmp/
+    /Volumes/
+)
+
+check() {
+  if [ "$(whoami)" != 'root' ]; then
+    LOG FATAL 'root privilege is required'
+  fi
+}
+
+call_rsync() {
+  local options=(rsync -av --delete --dry-run)
+  if [ "${#EXCLUDES[@]}" -ne 0 ]; then
+    for exclude in "${EXCLUDES[@]}"; do
+      options+=(--exclude="${exclude}")
+    done
+  fi
+  "${options[@]}" /Volumes/Ditto/ /
+}
+
+main() {
+  check
+  call_rsync
+}
+
+main
