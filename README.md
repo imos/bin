@@ -14,9 +14,11 @@ Note that you can run the command multiple times safely.
 ## Commands
 * [imofs](#imofs) ... imofs is a command-line tool to backup/restore files and services.
 * [imos-bashrc](#imos-bashrc) ... imos-bashrc is a bash init script.
+* [imos-install](#imos-install) ... #### Usage
 * [imos-passgen](#imos-passgen) ... imos-passgen is a password generator.
 * [imos-pokemon](#imos-pokemon) ... imos-pokemon prints the current volume's Pokémon name/ID.
 * [imos-start](#imos-start) ... imos-start is a start-up script.
+* [imos-stat](#imos-stat) ... imos-stat is a command for stat's compatibility.
 * [imos-variables](#imos-variables) ... imos-variables is a source file initializing variables.
 * [imosh](#imosh) ... imos is a utility library for BASH.
 * [ssh-for-git](#ssh-for-git) ... ssh-for-git runs ssh especially for git.
@@ -80,6 +82,17 @@ source /usr/imos/bin/imos-bashrc
 ```
 
 -----
+### imos-install
+#### Usage
+```sh
+imos-install
+```
+
+
+
+#### Options
+
+-----
 ### imos-passgen
 imos-passgen is a password generator.
 
@@ -141,9 +154,28 @@ imos-start
 
 
 #### Options
+
+-----
+### imos-stat
+imos-stat is a command for stat's compatibility.
+
+imos-stat displays information about a file.  GNU's stat and BSD's stat use
+different format, so imos-stat converts GNU's format to BSD's format if
+necessary.
+
+#### Usage
+```sh
+imos-stat --format=<format> <file>
+```
+
+
+
+#### Options
 ##### main options
-* --storage_directory='/Volumes/Arceus'
-    * Directory to be used as a storage directory.
+* --format=''
+    * Format.
+* --use_native_uname=true
+    * Use native UNAME instead.
 
 -----
 ### imos-variables
