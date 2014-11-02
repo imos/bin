@@ -1,4 +1,12 @@
 #!/bin/bash
+# imos-stat is a command for stat's compatibility.
+#
+# imos-stat displays information about a file.  GNU's stat and BSD's stat use
+# different format, so imos-stat converts GNU's format to BSD's format if
+# necessary.
+#
+# Usage:
+#     imos-stat --format=<format> <file>
 
 source "$(dirname "${BASH_SOURCE}")"/imosh || exit 1
 DEFINE_bool use_native_uname true 'Use native UNAME instead.'
@@ -9,11 +17,55 @@ if (( FLAGS_use_native_uname )); then
   UNAME="$(uname)"
 fi
 
-case "${UNAME}" in
-  Darwin)
-    stat -f "${FLAGS_format}" "$@";;
-  Linux)
-    stat --format "${FLAGS_format}" "$@";;
-  *)
-    LOG FATAL "Unsupported UNAME: ${UNAME}";;
-esac
+replace() {
+  func::str_replace format "$@"
+}
+
+stat-format() {
+  if [ "${#}" -eq 2 ]; then
+    local format="${1}"
+    local os="${2}"
+    func::str_replace format '%' $'\x02'
+    case "${os}" in
+      Darwin)
+        replace $'\x02a' '%p'  # access rights in octal
+        replace $'\x02A' '%Sp'  # access rights in human readable form
+        replace $'\x02b' '%b'  # number of blocks allocated
+        replace $'\x02B' '%k'  # the size in bytes of each block reported by %b
+        replace $'\x02g' '%g'  # group ID of owner
+        replace $'\x02G' '%Sg'  # group name of owner
+        replace $'\x02i' '%i'  # inode number
+        replace $'\x02s' '%z'  # total size, in bytes
+        replace $'\x02U' '%Su'  # user name of owner
+        replace $'\x02u' '%u'  # user ID of owner
+        replace $'\x02W' '%B'  # time of file birth, seconds since Epoch
+        replace $'\x02w' '%SB'  # time of file birth, human-readable
+        replace $'\x02X' '%a'  # time of last access, seconds since Epoch
+        replace $'\x02x' '%Sa'  # time of last access, human-readable
+        replace $'\x02Y' '%m'  # time of last modification, seconds since Epoch
+        replace $'\x02y' '%Sm'  # time of last modification, human-readable
+        replace $'\x02Z' '%c'  # time of last change, seconds since Epoch
+        replace $'\x02z' '%Sc'  # time of last change, human-readable
+        ;;
+    esac
+    replace $'\x02' '%'
+    func::println "${format}"
+  else
+    LOG ERROR "Wrong number of arguments: $#"
+  fi
+}
+
+main() {
+  local format="$(stat-format "${FLAGS_format}" "${UNAME}")"
+  LOG INFO "Format: ${format}"
+  case "${UNAME}" in
+    Darwin)
+      stat -f "${format}" "$@";;
+    Linux)
+      stat --format "${format}" "$@";;
+    *)
+      LOG FATAL "Unsupported UNAME: ${UNAME}";;
+  esac
+}
+
+main
