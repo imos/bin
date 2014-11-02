@@ -16,4 +16,19 @@ imos-pokemon() {
   echo 'Pikachu'
 }
 
+launchctl() {
+  case "${1}" in
+    list)
+      echo $'PID\tStatus\tLabel'
+      echo $'17\t0\tcom.apple.syslogd'
+      echo $'17\t0\tjp.imoz.foo'
+      ;;
+    load)
+      CHECK [ -f "${2}" ]
+      ;;
+    *)
+      LOG FATAL "Unknown launchctl command: ${1}";;
+  esac
+}
+
 source "$(dirname "${BASH_SOURCE}")"/../imos-install || exit 1

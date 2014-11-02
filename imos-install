@@ -41,6 +41,40 @@ backup_and_move() {
   fi
 }
 
+register_launchdaemons() {
+  local daemons_directory="${IMOS_ROOT}/Library/LaunchDaemons"
+  if [ ! -d "${daemons_directory}" ]; then
+    LOG ERROR "LaunchDaemons directory is not found: ${daemons_directory}"
+    return
+  fi
+  # Unregister imoz jobs first.
+  local job=''
+  while read -r -d$'\n' job; do
+    LOG INFO "Unregistering an imoz job: ${job}"
+    launchctl remove "${job}"
+  done < <(launchctl list | cut -d$'\t' -f 3 | grep '^jp.imoz.')
+  # Install launch daemons.
+  pushd "$(dirname "${BASH_SOURCE}")/data/LaunchDaemons" >'/dev/null'
+  for job in jp.imoz.*; do
+    if [ -f "${daemons_directory}/${job}" ]; then
+      rm "${daemons_directory}/${job}"
+    fi
+    if [ -f "${job}" ]; then
+      cat "${job}" > "${daemons_directory}/${job}"
+      chmod 644 "${daemons_directory}/${job}"
+    fi
+  done
+  popd >/dev/null
+  # Reload launch daemons.
+  pushd "${daemons_directory}" >'/dev/null'
+  for job in jp.imoz.*; do
+    if [ -f "${job}" ]; then
+      launchctl load "${job}"
+    fi
+  done
+  popd >'/dev/null'
+}
+
 imos-install::darwin() {
   if [ ! -L "${IMOS_STORAGE}" -a ! -a "${IMOS_STORAGE}" ]; then
     local arceus="${IMOS_ROOT}/Volumes/Arceus"
@@ -81,6 +115,7 @@ imos-install::darwin() {
   backup_and_move "${IMOS_ROOT}/var/vm" "${IMOS_STORAGE}/cache/var/vm"
   backup_and_move "${IMOS_ROOT}/Library/Caches" \
                   "${IMOS_STORAGE}/cache/Library/Caches"
+  register_launchdaemons
 }
 
 imos-install::linux() {

@@ -16,6 +16,7 @@ test::imos-install::darwin() {
   mkdir -p "${IMOS_ROOT}/Users/bar"
   mkdir -p "${IMOS_ROOT}/Library/Caches/test"
   mkdir -p "${IMOS_ROOT}/var/vm"
+  mkdir -p "${IMOS_ROOT}/Library/LaunchDaemons"
   UNAME=Darwin run
   EXPECT_EQ "${IMOS_ROOT}/Volumes/Arceus" \
             "$(readlink "${IMOS_ROOT}/storage")"
@@ -33,4 +34,6 @@ test::imos-install::darwin() {
             "$(readlink "${IMOS_ROOT}/Library/Caches")"
   EXPECT_EQ "${IMOS_ROOT}/storage/cache/var/vm" \
             "$(readlink "${IMOS_ROOT}/var/vm")"
+  EXPECT_TRUE \
+      [ -f "${IMOS_ROOT}/Library/LaunchDaemons/jp.imoz.imos-start.plist" ]
 }
