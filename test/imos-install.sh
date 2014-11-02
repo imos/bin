@@ -16,15 +16,22 @@ imos-pokemon() {
   echo 'Pikachu'
 }
 
+LAUNCHCTL_DIRECTORY="${TMPDIR}/launchctl"
+mkdir -p "${LAUNCHCTL_DIRECTORY}"
+echo $'PID\tStatus\tLabel' > "${LAUNCHCTL_DIRECTORY}/HEADER"
+echo $'17\t0\tcom.apple.syslogd' > "${LAUNCHCTL_DIRECTORY}/com.apple.syslogd"
+echo $'-\t0\tjp.imoz.foo' > "${LAUNCHCTL_DIRECTORY}/jp.imoz.foo"
 launchctl() {
   case "${1}" in
     list)
-      echo $'PID\tStatus\tLabel'
-      echo $'17\t0\tcom.apple.syslogd'
-      echo $'17\t0\tjp.imoz.foo'
+      cat "${LAUNCHCTL_DIRECTORY}"/*
       ;;
     load)
       CHECK [ -f "${2}" ]
+      ;;
+    remove)
+      CHECK [ -f "${LAUNCHCTL_DIRECTORY}/${2}" ]
+      rm "${LAUNCHCTL_DIRECTORY}/${2}"
       ;;
     *)
       LOG FATAL "Unknown launchctl command: ${1}";;
