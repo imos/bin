@@ -5,6 +5,7 @@ testing::run() {
   local test_name="$1"
 
   IMOSH_TEST_IS_FAILED=0
+  export IMOSH_TESTING=1
   test::"${test_name}"
   if (( IMOSH_TEST_IS_FAILED )); then
     exit 1

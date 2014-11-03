@@ -94,16 +94,20 @@ pokemon::linux() {
   esac
 }
 
-: "${POKEMON_NAME:=}"
-if (( FLAGS_cache )) && [ -f "${FLAGS_cache_file}" ]; then
-  func::file_get_contents POKEMON_NAME "${FLAGS_cache_file}"
-  func::trim POKEMON_NAME
-fi
-if [ "${POKEMON_NAME}" = '' ]; then
-  POKEMON_NAME="$(pokemon::"$(sub::strtolower "${UNAME}")")"
-  if [ "${FLAGS_cache_file}" != '' ]; then
-    if [ ! -f "${FLAGS_cache_file}" ]; then
-      func::println "${POKEMON_NAME}" > "${FLAGS_cache_file}" || true
+if func::isset IMOSH_TESTING; then
+  POKEMON_NAME=Psyduck
+else
+  : "${POKEMON_NAME:=}"
+  if (( FLAGS_cache )) && [ -f "${FLAGS_cache_file}" ]; then
+    func::file_get_contents POKEMON_NAME "${FLAGS_cache_file}"
+    func::trim POKEMON_NAME
+  fi
+  if [ "${POKEMON_NAME}" = '' ]; then
+    POKEMON_NAME="$(pokemon::"$(sub::strtolower "${UNAME}")")"
+    if [ "${FLAGS_cache_file}" != '' ]; then
+      if [ ! -f "${FLAGS_cache_file}" ]; then
+        func::println "${POKEMON_NAME}" > "${FLAGS_cache_file}" || true
+      fi
     fi
   fi
 fi

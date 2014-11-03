@@ -255,4 +255,5 @@ hostname() {
   fi
 }
 
+unset IMOSH_TESTING
 source "$(dirname "${BASH_SOURCE}")"/../imos-pokemon || exit 1
