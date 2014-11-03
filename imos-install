@@ -83,6 +83,8 @@ imos-install::darwin() {
     fi
     ln -s "${arceus}" "${IMOS_STORAGE}"
   fi
+  LOG INFO 'Install a password...'
+  imos-crypt --installed_password --encrypt
   LOG INFO 'Preparing user files...'
   pushd "${IMOS_USERS}" >/dev/null
   local user=''
