@@ -13,7 +13,7 @@ whoami() {
 
 imos-pokemon() {
   LOG INFO "Command: imos-pokemon $*"
-  echo 'Pikachu'
+  echo 'Psyduck'
 }
 
 mkdir -p "${TMPDIR}/scutil"

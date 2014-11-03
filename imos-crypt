@@ -6,6 +6,7 @@
 
 source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
 DEFINE_string password '' 'Password to use instead.'
+DEFINE_bool installed_password false 'Use the installed password instead.'
 DEFINE_bool encrypt false 'Encrypt files.'
 DEFINE_bool decrypt false 'Decrypt files.'
 eval "${IMOSH_INIT}"
@@ -13,6 +14,25 @@ eval "${IMOSH_INIT}"
 get_password() {
   if [ "${FLAGS_password}" != '' ]; then
     func::println "${FLAGS_password}"
+    return
+  fi
+  if (( FLAGS_installed_password )); then
+    local password_file="${IMOS_ROOT}/usr/imos/config/installed-password"
+    mkdir -p "$(dirname "${password_file}")"
+    if [ ! -f "${password_file}" ]; then
+      if [ "$(whoami)" != 'root' ]; then
+        LOG FATAL 'root privilege is required to install a password.'
+      fi
+      imos-crypt --decrypt \
+          "$(dirname "${BASH_SOURCE}")/data/installed-password.aes256" \
+          "${password_file}"
+      chmod 600 "${password_file}"
+    fi
+    if [ -r "${password_file}" ]; then
+      func::println "$(cat "${password_file}")"
+    else
+      func::println "$(sudo cat "${password_file}")"
+    fi
     return
   fi
   local seed=() password=''

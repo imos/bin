@@ -54,7 +54,7 @@ func::imos_get_users() {
     local __imos_get_users_users=()
     case "${UNAME}" in
       Darwin)
-        cd "${IMOS_ROOT}/Users"
+        pushd "${IMOS_ROOT}/Users" > '/dev/null'
         for user in *; do
           case "${user}" in
             Guest|Shared|provision|ninetan) :;;
@@ -65,14 +65,16 @@ func::imos_get_users() {
               ;;
           esac
         done
+        popd > '/dev/null'
         ;;
       *)
-        cd "${IMOS_ROOT}/home"
+        pushd "${IMOS_ROOT}/home" > '/dev/null'
         for user in *; do
           if [ -d "${user}" ]; then
             __imos_get_users_users+=("${user}")
           fi
         done
+        popd > '/dev/null'
         ;;
     esac
     if [ "${#__imos_get_users_users}" -eq 0 ]; then

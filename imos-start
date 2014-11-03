@@ -39,6 +39,23 @@ start::darwin() {
         fi
       done
     fi
+
+    local variance_directory="$(
+        dirname "${BASH_SOURCE}")/data/variance/${POKEMON}"
+    if [ -d "${variance_directory}" ]; then
+      LOG INFO 'Installing variances...'
+      pushd "${variance_directory}" > '/dev/null'
+      for file in *.tar.aes256; do
+        LOG INFO "Deploying ${file}..."
+        func::str_replace file '.aes256' ''
+        imos-crypt --decrypt --installed_password \
+            "${file}.aes256" "${TMPDIR}/${file}"
+        pushd "${IMOS_ROOT}" > '/dev/null'
+        tar xvf "${TMPDIR}/${file}"
+        popd > '/dev/null'
+      done
+      popd > '/dev/null'
+    fi
   fi
 }
 
