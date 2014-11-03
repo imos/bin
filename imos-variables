@@ -23,7 +23,8 @@ if [ "${__IMOS_VARIABLES_IS_LOADED+loaded}" = 'loaded' ]; then return; fi
 __IMOS_VARIABLES_IS_LOADED=1
 source "$(dirname "${BASH_SOURCE}")"/imosh || exit 1
 
-export PATH="$(dirname "${BASH_SOURCE}"):${PATH}"
+IMOS_BIN="$(cd "$(dirname "${BASH_SOURCE}")"; pwd)"
+export PATH="${IMOS_BIN}:${PATH}"
 export POKEMON="$(imos-pokemon)"
 
 if ! func::isset IMOS_ROOT; then
@@ -35,8 +36,8 @@ if ! func::isset IMOS_STORAGE; then
 fi
 
 if ! func::isset IMOS_RESOURCE; then
-  if [ -d "$(dirname "${BASH_SOURCE}")/../resource" ]; then
-    IMOS_RESOURCE="$(cd "$(dirname "${BASH_SOURCE}")/../resource"; pwd)"
+  if [ -d "${IMOS_BIN}/../resource" ]; then
+    IMOS_RESOURCE="$(cd "${IMOS_BIN}/../resource"; pwd)"
   fi
 fi
 
