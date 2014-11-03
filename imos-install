@@ -97,7 +97,7 @@ imos-install::darwin() {
         chmod 755 "${storage_home}"
         local directories=(
             '.dropbox' 'Desktop' 'Documents' 'Downloads' 'Dropbox'
-            'Movies' 'Music' 'Pictures')
+            'Movies' 'Music')
         local directory=''
         for directory in "${directories[@]}"; do
           backup_and_move "${user}/${directory}" "${storage_home}/${directory}"
