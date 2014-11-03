@@ -15,5 +15,9 @@
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
+	<key>StandardOutPath</key>
+	<string>/tmp/jp.imoz.imos-start.log.STDOUT</string>
+	<key>StandardErrorPath</key>
+	<string>/tmp/jp.imoz.imos-start.log.STDERR</string>
 </dict>
 </plist>
