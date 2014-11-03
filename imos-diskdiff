@@ -7,26 +7,35 @@
 #     imos-diskdiff
 
 source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
+DEFINE_string source '/Volumes/Ditto/' 'Source volume.'
+DEFINE_string target '/' 'Target volume.'
 eval "${IMOSH_INIT}"
 
 EXCLUDES=(
-    /.fseventsd/
-    /.Spotlight-V100/
-    /.Trashes/
-    /.VolumeIcon.icns
-    /dev/
-    /net/
-    /private/tmp/
-    /private/var/folders/
-    /private/var/log/
-    /private/var/root/
-    /private/var/run/
-    /private/var/spool/cups/
-    /private/var/spool/postfix/
-    /private/var/tmp/
-    /System/Library/Caches/
-    /tmp/
-    /Volumes/
+    '.dbfseventsd'
+    '.DocumentRevisions-V100/'
+    '.fseventsd/'
+    '.Spotlight-V100/'
+    '.Trashes/'
+    '.VolumeIcon.icns'
+    'dev/'
+    'Library/Application Support/com.bombich.ccc/'
+    'net/'
+    'private/tmp/'
+    'private/var/folders/'
+    'private/var/log/'
+    'private/var/root/'
+    'private/var/run/'
+    'private/var/spool/cups/'
+    'private/var/spool/postfix/'
+    'private/var/tmp/'
+    'System/Library/Caches/'
+    'System/Library/CoreServices/'
+    'tmp/'
+    'Users/*/.Trash/'
+    'Users/*/Library/Application Support/com.bombich.ccc/'
+    'Users/*/Library/Saved Application State/'
+    'Volumes/'
 )
 
 check() {
@@ -42,7 +51,7 @@ call_rsync() {
       options+=(--exclude="${exclude}")
     done
   fi
-  "${options[@]}" /Volumes/Ditto/ /
+  "${options[@]}" "${FLAGS_source}" "${FLAGS_target}"
 }
 
 main() {

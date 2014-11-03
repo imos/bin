@@ -47,3 +47,40 @@ if ! func::isset IMOS_USERS; then
     *)      IMOS_USERS="${IMOS_ROOT}/home";;
   esac
 fi
+
+func::imos_get_users() {
+  if [ "${#}" -eq 1 ]; then
+    local __imos_get_users_variable="${1}"
+    local __imos_get_users_users=()
+    case "${UNAME}" in
+      Darwin)
+        cd "${IMOS_ROOT}/Users"
+        for user in *; do
+          case "${user}" in
+            Guest|Shared|provision|ninetan) :;;
+            *)
+              if [ -d "${user}" ]; then
+                __imos_get_users_users+=("${user}")
+              fi
+              ;;
+          esac
+        done
+        ;;
+      *)
+        cd "${IMOS_ROOT}/home"
+        for user in *; do
+          if [ -d "${user}" ]; then
+            __imos_get_users_users+=("${user}")
+          fi
+        done
+        ;;
+    esac
+    if [ "${#__imos_get_users_users}" -eq 0 ]; then
+      eval "${__imos_get_users_variable}=()"
+    else
+      eval "${__imos_get_users_variable}=(\"\${__imos_get_users_users[@]}\")"
+    fi
+  else
+    LOG ERROR "Wrong number of arguments: ${#}"
+  fi
+}

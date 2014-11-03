@@ -19,9 +19,25 @@ check() {
 }
 
 start::darwin() {
+  LOG INFO "Initializing host names with ${POKEMON}..."
   scutil --set ComputerName "${POKEMON}"
   scutil --set LocalHostName "${POKEMON}"
   scutil --set HostName "${POKEMON}.local"
+
+  LOG INFO 'Installing pictures...'
+  local users=()
+  func::imos_get_users users
+  local user=''
+  if [ "${#users[*]}" -ne 0 ]; then
+    for user in "${users[@]}"; do
+      if [ ! -L "${IMOS_ROOT}/Users/${user}/Pictures" ]; then
+        LOG INFO "Replacing ${user}'s Pictures directory..."
+        rm -R -f "${IMOS_ROOT}/Users/${user}/Pictures"
+        ln -s "${IMOS_ROOT}/storage/home/${user}/Pictures" \
+              "${IMOS_ROOT}/Users/${user}/Pictures"
+      fi
+    done
+  fi
 }
 
 start::linux() {
