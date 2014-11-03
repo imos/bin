@@ -16,7 +16,7 @@ Note that you can run the command multiple times safely.
 * [imos-bashrc](#imos-bashrc) ... imos-bashrc is a bash init script.
 * [imos-crypt](#imos-crypt) ... imos-crypt encrypts and decrypts files.
 * [imos-diskdiff](#imos-diskdiff) ... imos-diskdiff compares disk volumes.
-* [imos-install](#imos-install) ... #### Usage
+* [imos-install](#imos-install) ... imos-install is a script to configure imos-bin.
 * [imos-passgen](#imos-passgen) ... imos-passgen is a password generator.
 * [imos-pokemon](#imos-pokemon) ... imos-pokemon prints the current volume's Pokémon name/ID.
 * [imos-start](#imos-start) ... imos-start is a start-up script.
@@ -100,6 +100,8 @@ imos-crypt [options] [input output] ...
     * Decrypt files.
 * --encrypt=false
     * Encrypt files.
+* --installed_password=false
+    * Use the installed password instead.
 * --password=''
     * Password to use instead.
 
@@ -125,6 +127,11 @@ imos-diskdiff
 
 -----
 ### imos-install
+imos-install is a script to configure imos-bin.
+
+imos-install configures user directories and installs an installed
+password if necessary.  This script requires the root privilege.
+
 #### Usage
 ```sh
 imos-install

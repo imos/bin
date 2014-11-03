@@ -1,4 +1,9 @@
 #!/bin/bash
+# imos-install is a script to configure imos-bin.
+#
+# imos-install configures user directories and installs an installed
+# password if necessary.  This script requires the root privilege.
+#
 # Usage:
 #     imos-install
 

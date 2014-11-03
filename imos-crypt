@@ -1,5 +1,12 @@
 #!/bin/bash
-# imos-crypt encrypts and decrypts files.
+# imos-crypt encrypts/decrypts files.
+#
+# imos-crypt encrypts/decrypts files using an embedded password by default.
+# The embedded password is encrypted with a master password that should be
+# given by imos.  The installed_password flag makes imos-crypt use the
+# installed password, which should be installed by imos-start.  The password
+# flag forces the script to use the password given by the flag.  This script
+# uses AES-256-CBC to encrypt/decrypt.
 #
 # Usage:
 #     imos-crypt [options] [input output] ...
