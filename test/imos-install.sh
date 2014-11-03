@@ -16,6 +16,10 @@ imos-pokemon() {
   echo 'Pikachu'
 }
 
+imos-crypt() {
+  LOG INFO "Command: imos-crypt $*"
+}
+
 LAUNCHCTL_DIRECTORY="${TMPDIR}/launchctl"
 mkdir -p "${LAUNCHCTL_DIRECTORY}"
 echo $'PID\tStatus\tLabel' > "${LAUNCHCTL_DIRECTORY}/HEADER"
