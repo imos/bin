@@ -6,6 +6,11 @@
 	<false/>
 	<key>KeepAlive</key>
 	<false/>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>IMOSH_FLAGS_alsologtostderr</key>
+		<string>1</string>
+	</dict>
 	<key>Label</key>
 	<string>jp.imoz.imos-start</string>
 	<key>ProgramArguments</key>

@@ -60,8 +60,12 @@ pokemon::darwin() {
 
   for command in "${commands[@]}"; do
     local name="$("${command}")"
-    LOG INFO "${command} infers ${name}"
-    func::println "${name}"
+    if [ "${name}" = '' ]; then
+      LOG ERROR "${command} failed and returned an empty value."
+    else
+      LOG INFO "${command} infers ${name}"
+      func::println "${name}"
+    fi
   done >"${TMPDIR}/commands.txt"
   if [ "$(wc -l < "${TMPDIR}/commands.txt")" -ne 3 -o \
        "$(uniq "${TMPDIR}/commands.txt" | wc -l)" -ne 1 ]; then
