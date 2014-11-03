@@ -14,6 +14,8 @@ Note that you can run the command multiple times safely.
 ## Commands
 * [imofs](#imofs) ... imofs is a command-line tool to backup/restore files and services.
 * [imos-bashrc](#imos-bashrc) ... imos-bashrc is a bash init script.
+* [imos-crypt](#imos-crypt) ... imos-crypt encrypts and decrypts files.
+* [imos-diskdiff](#imos-diskdiff) ... imos-diskdiff compares disk volumes.
 * [imos-install](#imos-install) ... #### Usage
 * [imos-passgen](#imos-passgen) ... imos-passgen is a password generator.
 * [imos-pokemon](#imos-pokemon) ... imos-pokemon prints the current volume's Pokémon name/ID.
@@ -80,6 +82,46 @@ imos-bashrc initializes PS1 and sources init files.
 ```sh
 source /usr/imos/bin/imos-bashrc
 ```
+
+-----
+### imos-crypt
+imos-crypt encrypts and decrypts files.
+
+#### Usage
+```sh
+imos-crypt [options] [input output] ...
+```
+
+
+
+#### Options
+##### main options
+* --decrypt=false
+    * Decrypt files.
+* --encrypt=false
+    * Encrypt files.
+* --password=''
+    * Password to use instead.
+
+-----
+### imos-diskdiff
+imos-diskdiff compares disk volumes.
+
+imos-diskdiff compares disk volumes and list different files.
+
+#### Usage
+```sh
+imos-diskdiff
+```
+
+
+
+#### Options
+##### main options
+* --source='/Volumes/Ditto/'
+    * Source volume.
+* --target='/'
+    * Target volume.
 
 -----
 ### imos-install
