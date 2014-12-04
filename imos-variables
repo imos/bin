@@ -27,21 +27,21 @@ IMOS_BIN="$(cd "$(dirname "${BASH_SOURCE}")"; pwd)"
 export PATH="${IMOS_BIN}:${PATH}"
 export POKEMON="$(imos-pokemon)"
 
-if ! func::isset IMOS_ROOT; then
+if ! sub::isset IMOS_ROOT; then
   IMOS_ROOT=''
 fi
 
-if ! func::isset IMOS_STORAGE; then
+if ! sub::isset IMOS_STORAGE; then
   IMOS_STORAGE="${IMOS_ROOT}/storage"
 fi
 
-if ! func::isset IMOS_RESOURCE; then
+if ! sub::isset IMOS_RESOURCE; then
   if [ -d "${IMOS_BIN}/../resource" ]; then
     IMOS_RESOURCE="$(cd "${IMOS_BIN}/../resource"; pwd)"
   fi
 fi
 
-if ! func::isset IMOS_USERS; then
+if ! sub::isset IMOS_USERS; then
   case "${UNAME}" in
     Darwin) IMOS_USERS="${IMOS_ROOT}/Users";;
     Linux)  IMOS_USERS="${IMOS_ROOT}/home";;

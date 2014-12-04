@@ -26,7 +26,7 @@ DEFINE_string pokemon_error_level 'ERROR' \
 eval "${IMOSH_INIT}"
 
 pokemon::darwin::system_profiler() {
-  func::println \
+  sub::println \
       "$(system_profiler -xml -detailLevel full SPSoftwareDataType |
          plutil -extract '0._items.0.boot_volume' xml1 -o - - |
          xpath '/plist/string/text()' 2>/dev/null)"
@@ -34,7 +34,7 @@ pokemon::darwin::system_profiler() {
 
 pokemon::darwin::diskutil() {
   local device="$(df / | grep /dev/ | awk '{ print $1 }')"
-  func::println \
+  sub::println \
       "$(diskutil info -plist "${device}" |
          plutil -extract VolumeName xml1 -o - - |
          xpath '/plist/string/text()' 2>/dev/null)"
@@ -44,7 +44,7 @@ pokemon::darwin::volume() {
   cd /Volumes
   for disk in * Pikachu; do
     if [ "$(readlink "${disk}")" = '/' ]; then
-      func::println "${disk}"
+      sub::println "${disk}"
       return
     fi
   done
@@ -64,7 +64,7 @@ pokemon::darwin() {
       LOG ERROR "${command} failed and returned an empty value."
     else
       LOG INFO "${command} infers ${name}"
-      func::println "${name}"
+      sub::println "${name}"
     fi
   done >"${TMPDIR}/commands.txt"
   if [ "$(wc -l < "${TMPDIR}/commands.txt")" -ne 3 -o \
@@ -80,21 +80,21 @@ pokemon::darwin() {
 pokemon::linux() {
   case "$(hostname -i)" in
     '153.121.64.206')
-      func::println 'Dunsparce';;
+      sub::println 'Dunsparce';;
     *)
       case "$(hostname -s)" in
         'oddish-imos')
-          func::println 'Oddish';;
+          sub::println 'Oddish';;
         'cyndaquil-imos')
-          func::println 'Cyndaquil';;
+          sub::println 'Cyndaquil';;
         *)
           LOG "${FLAGS_pokemon_error_level}" 'resolution failed.'
-          func::println 'Unown';;
+          sub::println 'Unown';;
       esac
   esac
 }
 
-if func::isset IMOSH_TESTING; then
+if sub::isset IMOSH_TESTING; then
   POKEMON_NAME=Psyduck
 else
   : "${POKEMON_NAME:=}"
@@ -106,7 +106,7 @@ else
     POKEMON_NAME="$(pokemon::"$(sub::strtolower "${UNAME}")")"
     if [ "${FLAGS_cache_file}" != '' ]; then
       if [ ! -f "${FLAGS_cache_file}" ]; then
-        func::println "${POKEMON_NAME}" > "${FLAGS_cache_file}" || true
+        sub::println "${POKEMON_NAME}" > "${FLAGS_cache_file}" || true
       fi
     fi
   fi
@@ -119,9 +119,9 @@ POKEMON_ID="$(
 LOG INFO "pokemon ID is ${POKEMON_ID}"
 
 if (( FLAGS_id )); then
-  func::println "${POKEMON_ID}"
+  sub::println "${POKEMON_ID}"
 else
-  func::println "${POKEMON_NAME}"
+  sub::println "${POKEMON_NAME}"
 fi
 
 if [ "${POKEMON_ID}" = '' -o \
