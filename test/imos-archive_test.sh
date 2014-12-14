@@ -1,4 +1,8 @@
 run() {
+  local tmporary_directory=''
+  func::tmpfile temporary_directory
+  mkdir -p "${tmporary_directory}"
+  cd "${temporary_directory}"
   local output_file=''
   func::tmpfile output_file
   ../imos-archive --output="${output_file}" "$@"

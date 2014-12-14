@@ -6,6 +6,9 @@
 
 source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
 DEFINE_int file_size 0 'Maximum size of a generated archive in bytes.'
+DEFINE_bool pass_working_directory false \
+    "Pass a caller's working directory to the program." \
+    "Otherwise, a callee's working directory is under the package."
 DEFINE_string output '' 'Path to output the archive to.'
 DEFINE_string command '' 'Command to run.'
 eval "${IMOSH_INIT}"
@@ -19,6 +22,9 @@ create_tar() {
       local command_file="${package_directory}/COMMAND"
       {
         sub::println '#!/bin/bash'
+        if (( ! FLAGS_pass_working_directory )); then
+          sub::println 'cd "$(dirname "${BASH_SOURCE}")/bin"'
+        fi
         sub::println "${FLAGS_command}"
       } > "${command_file}"
       chmod +x "${command_file}"
@@ -55,12 +61,13 @@ archive_tar() {
   if [ "$#" -eq 2 ]; then
     local command='#!/bin/bash
 set -e -u
-export package_directory="${TMPDIR}/package.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}/package"
+package_directory="${TMPDIR}/package.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}/package"
 mkdir -p "${package_directory}"
-pushd "${package_directory}" >/dev/null
-cat "${BASH_SOURCE}" | tail -n +NUM_OF_LINES > "../package.tar"
-tar zxvf "../package.tar" 2>/dev/null
-popd >/dev/null
+cat "${BASH_SOURCE}" | tail -n +NUM_OF_LINES | {
+  pushd "${package_directory}" >/dev/null
+  tar zxvf - 2>/dev/null
+  popd >/dev/null
+}
 "${package_directory}/COMMAND"
 exit 0
 '
@@ -79,7 +86,7 @@ exit 0
 
 main() {
   if [ "${FLAGS_output}" = '' ]; then
-    LOG FATAL '--output flag must be specified.'
+    LOG FATAL '--output flag msut be specified.'
   fi
   if [ "${FLAGS_command}" = '' ]; then
     LOG FATAL '--command flag must be specified.'
