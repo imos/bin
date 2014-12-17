@@ -11,6 +11,7 @@ DEFINE_bool pass_working_directory false \
     "Otherwise, a callee's working directory is under the package."
 DEFINE_string output '' 'Path to output the archive to.'
 DEFINE_string command '' 'Command to run.'
+DEFINE_bool extra_arguments true 'Append extra arguments.'
 eval "${IMOSH_INIT}"
 
 create_tar() {
@@ -25,7 +26,11 @@ create_tar() {
         if (( ! FLAGS_pass_working_directory )); then
           sub::println 'cd "$(dirname "${BASH_SOURCE}")/bin"'
         fi
-        sub::println "${FLAGS_command}"
+        if (( FLAGS_extra_arguments )); then
+          sub::println "${FLAGS_command} \"\$@\""
+        else
+          sub::println "${FLAGS_command}"
+        fi
       } > "${command_file}"
       chmod +x "${command_file}"
     fi
@@ -68,7 +73,7 @@ cat "${BASH_SOURCE}" | tail -n +NUM_OF_LINES | {
   tar zxvf - 2>/dev/null
   popd >/dev/null
 }
-"${package_directory}/COMMAND"
+"${package_directory}/COMMAND" "$@"
 exit 0
 '
     local command_lines=()
