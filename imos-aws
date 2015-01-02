@@ -1,0 +1,13 @@
+#!/bin/bash
+# imos-aws calls aws with imos credentails.
+#
+# Usage:
+#     imos-aws options...
+
+source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
+
+mkdir "${TMPDIR}/.aws"
+imos-crypt --decrypt --installed_password \
+    "${IMOS_BIN}/data/aws.aes256" "${TMPDIR}/.aws/credentials"
+sub::println '[profile imos-package]' > "${TMPDIR}/.aws/config"
+HOME="${TMPDIR}" aws "$@"
