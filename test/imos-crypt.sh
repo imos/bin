@@ -7,7 +7,7 @@ run() {
 }
 
 test::imos-crypt() {
-  func::print 'foobar' > "${TMPDIR}/input"
+  sub::print 'foobar' > "${TMPDIR}/input"
   run --encrypt "${TMPDIR}/input" "${TMPDIR}/encrypted"
   EXPECT_NE 'foobar' \
             "$(cat "${TMPDIR}/encrypted")"

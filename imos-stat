@@ -49,7 +49,7 @@ stat-format() {
         ;;
     esac
     replace $'\x02' '%'
-    func::println "${format}"
+    sub::println "${format}"
   else
     LOG ERROR "Wrong number of arguments: $#"
   fi

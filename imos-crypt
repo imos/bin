@@ -20,7 +20,7 @@ eval "${IMOSH_INIT}"
 
 get_password() {
   if [ "${FLAGS_password}" != '' ]; then
-    func::println "${FLAGS_password}"
+    sub::println "${FLAGS_password}"
     return
   fi
   if (( FLAGS_installed_password )); then
@@ -36,9 +36,9 @@ get_password() {
       chmod 600 "${password_file}"
     fi
     if [ -r "${password_file}" ]; then
-      func::println "$(cat "${password_file}")"
+      sub::println "$(cat "${password_file}")"
     else
-      func::println "$(sudo cat "${password_file}")"
+      sub::println "$(sudo cat "${password_file}")"
     fi
     return
   fi
@@ -55,7 +55,7 @@ get_password() {
     if [ "${password:0:4}" = 'mT25' ]; then break; fi
     LOG ERROR 'Wrong password.'
   done
-  func::println "${password}"
+  sub::println "${password}"
 }
 
 main() {

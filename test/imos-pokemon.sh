@@ -238,9 +238,9 @@ readlink() {
   if [ "${#}" -eq 1 ]; then
     local path="$(pwd)/${1}"
     if [ "${path}" = '/Volumes/Pikachu' ]; then
-      func::println '/'
+      sub::println '/'
     else
-      func::println "${path}"
+      sub::println "${path}"
     fi
   else
     LOG FATAL "Wrong number of arguments."
@@ -249,7 +249,7 @@ readlink() {
 
 hostname() {
   if [ "$*" = '-i' ]; then
-    func::println '153.121.64.206'
+    sub::println '153.121.64.206'
   else
     LOG FATAL "Unknown flags: $*"
   fi

@@ -20,7 +20,7 @@ mkdir -p "${TMPDIR}/scutil"
 scutil() {
   if [ "${#}" -eq 3 ]; then
     CHECK [ "${1}" = '--set' ]
-    func::println "${3}" > "${TMPDIR}/scutil/${2}"
+    sub::println "${3}" > "${TMPDIR}/scutil/${2}"
   else
     LOG FATAL "Wrong number of arguments: ${#}"
   fi
