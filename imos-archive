@@ -70,7 +70,7 @@ package_directory="${TMPDIR}/package.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}.${R
 mkdir -p "${package_directory}"
 cat "${BASH_SOURCE}" | tail -n +NUM_OF_LINES | {
   pushd "${package_directory}" >/dev/null
-  tar zxvf - 2>/dev/null
+  tar zxvf - >/dev/null 2>/dev/null
   popd >/dev/null
 }
 "${package_directory}/COMMAND" "$@"
