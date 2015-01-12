@@ -132,8 +132,8 @@ test::imos-package-upload() {
          } | \
          stream::md5)"
   EXPECT_EQ "$(
-      echo c4095b9c7c0a5d8dc6472ecb3fb7395e
-      echo b8465f50d9579a17a918285548090783
-      echo bcab5aa38bd1777c2cdbc1b79cee353f)" \
+      echo 'c4095b9c7c0a5d8dc6472ecb3fb7395e'
+      echo 'b8465f50d9579a17a918285548090783'
+      echo 'bcab5aa38bd1777c2cdbc1b79cee353f')" \
       "$(cat "${WORKING_DIRECTORY}/0982e972bf2e287852c958582b0e4364")"
 }
