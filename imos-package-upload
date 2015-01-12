@@ -41,6 +41,15 @@ mdate() {
   fi
 }
 
+# For testing.  This function will be overridden in tests.
+create_working_directory() {
+  if [ "$#" -eq 1 ]; then
+    func::tmpfile "${1}"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
 touch_object() {
   if [ "$#" -eq 1 ]; then
     imos-aws s3api copy-object \
@@ -80,8 +89,9 @@ upload() {
 
 package::split() {
   local fragments_directory=''
-  func::tmpfile fragments_directory
+  create_working_directory fragments_directory
   mkdir "${fragments_directory}"
+  LOG INFO "Fragments directory: ${fragments_directory}"
   if [ -s "${1}" ]; then
     split -a 3 -b "${FLAGS_fragment_size}" "${1}" "${fragments_directory}/"
   else
