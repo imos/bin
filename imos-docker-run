@@ -1,0 +1,46 @@
+#!/bin/bash
+# imos-archive archives/dearchives files.
+#
+# Usage:
+#     imos-crypt [options] [input output] ...
+
+source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
+DEFINE_string container 'ephemeral' 'Container image to use.'
+DEFINE_string command 'su -' 'Command to run inside docker.'
+DEFINE_string volume '/:/host' 'Volumes to attach.'
+DEFINE_bool interactive true 'Enable interactive mode.'
+DEFINE_bool rebuild false 'Re-build a base image.'
+eval "${IMOSH_INIT}"
+
+rebuild() {
+  CHECK [ "${FLAGS_container}" = 'ephemeral' ]
+  cat << 'EOM' > "${TMPDIR}/Dockerfile"
+FROM ubuntu:14.04
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update -qq && apt-get -y install git man
+RUN mkdir -p /usr/imos
+RUN git clone https://github.com/imos/bin /usr/imos/bin
+RUN echo 'source /usr/imos/bin/data/bashrc' >'/root/.bash_aliases'
+EOM
+  docker build --tag="${FLAGS_container}" "${TMPDIR}"
+}
+
+main() {
+  if [ "$#" -eq 0 ]; then
+    if (( FLAGS_rebuild )); then
+      rebuild
+    fi
+    DOCKER_FLAGS=()
+    if (( FLAGS_interactive )); then
+      DOCKER_FLAGS+=(--interactive --rm --tty)
+    fi
+    if [ "${FLAGS_volume}" != '' ]; then
+      DOCKER_FLAGS+=(--volume="${FLAGS_volume}")
+    fi
+    docker run "${DOCKER_FLAGS[@]}" "${FLAGS_container}" ${FLAGS_command}
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+main "$@"
