@@ -7,9 +7,10 @@
 source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
 DEFINE_string alias '' 'Alias name of the package.'
 DEFINE_int fragment_size "$(( 1024 * 1024 ))" 'Limit of fragment size.'
-DEFINE_string bucket 'package.imoz.jp' 'Bucket name.'
+DEFINE_string bucket 'imos-package' 'Bucket name.'
+DEFINE_string host 's3-ap-northeast-1.amazonaws.com' 'Host name.'
 DEFINE_int threads 64 'The number of threads to upload with.'
-if sub::isset IMOSH_TESTING; then
+if ! sub::isset IMOSH_TESTING; then
   eval "${IMOSH_INIT}"
 fi
 
@@ -30,7 +31,8 @@ rfc2date() {
 mdate() {
   if [ "$#" -eq 1 ]; then
     local mtime="$(
-        curl --silent --fail --head "http://${FLAGS_bucket}/${1}" | \
+        curl --silent --fail --head \
+            "https://${FLAGS_host}/${FLAGS_bucket}/${1}" | \
             grep -i last-modified | cut -d: -f2-)"
     func::trim mtime
     if [ "${mtime}" != '' ]; then
@@ -134,6 +136,6 @@ main() {
   done
 }
 
-if sub::isset IMOSH_TESTING; then
+if ! sub::isset IMOSH_TESTING; then
   main "$@"
 fi
