@@ -63,7 +63,7 @@ main() {
       fi
     done <"${list_file}"
     if [ "${FLAGS_output}" != '' ]; then
-      mv -f "${output_file}" "${FLAGS_output}"
+      cat "${output_file}" >"${FLAGS_output}"
     fi
   else
     eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
@@ -71,5 +71,8 @@ main() {
 }
 
 if ! sub::isset IMOSH_TESTING; then
+  if [ "${FLAGS_output}" = '' ]; then
+    LOG FATAL '--output flag is required.'
+  fi
   main "$@"
 fi

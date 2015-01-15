@@ -52,7 +52,7 @@ create_working_directory() {
 
 run() {
   true >"${TMPDIR}/imos-aws"
-  main "$@"
+  main "$@" >'/dev/null'
   cat "${TMPDIR}/imos-aws" | \
       stream::str_replace "${WORKING_DIRECTORY}" 'WORKING_DIRECTORY'
 }

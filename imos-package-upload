@@ -127,6 +127,7 @@ package::split() {
   LOG INFO "List file: ${md5}"
   upload "${md5}" "${list_file}"
   wait
+  sub::println "${md5}"
 }
 
 main() {
