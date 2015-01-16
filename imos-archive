@@ -12,7 +12,7 @@ DEFINE_bool pass_working_directory false \
 DEFINE_string output '' 'Path to output the archive to.'
 DEFINE_string command '' 'Command to run.'
 DEFINE_bool extra_arguments true 'Append extra arguments.'
-eval "${IMOSH_INIT}"
+IMOSH_SKIP_EXTRA_OPTIONS=1 eval "${IMOSH_INIT}"
 
 create_tar() {
   if [ "$#" -eq 1 ]; then
@@ -93,8 +93,17 @@ main() {
   if [ "${FLAGS_output}" = '' ]; then
     LOG FATAL '--output flag msut be specified.'
   fi
-  if [ "${FLAGS_command}" = '' ]; then
-    LOG FATAL '--command flag must be specified.'
+  if [ "$#" -eq 0 ]; then
+    if [ "${FLAGS_command}" = '' ]; then
+      LOG FATAL '--command flag or arguments must be specified.'
+    fi
+  else
+    if [ "${FLAGS_command}" != '' ]; then
+      LOG FATAL 'Both of --command flag and arguments are specified.'
+    fi
+    local arguments=("$@")
+    func::array_map arguments INPLACE func::escapeshellarg
+    func::implode FLAGS_command ' ' arguments
   fi
   local tar_file="${TMPDIR}/package.tar"
   local sar_file="${TMPDIR}/package.sar"
