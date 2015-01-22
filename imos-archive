@@ -12,7 +12,7 @@ DEFINE_bool pass_working_directory false \
 DEFINE_string output '' 'Path to output the archive to.'
 DEFINE_string command '' 'Command to run.'
 DEFINE_bool extra_arguments true 'Append extra arguments.'
-IMOSH_SKIP_EXTRA_OPTIONS=1 eval "${IMOSH_INIT}"
+IMOSH_PREDICATE=1 eval "${IMOSH_INIT}"
 
 create_tar() {
   if [ "$#" -eq 1 ]; then

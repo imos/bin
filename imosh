@@ -3,7 +3,7 @@
 #
 # For more details, see https://github.com/imos/imosh
 
-IMOSH_VERSION='2014-12-14 10:47:11 +0900 (2112825)'
+IMOSH_VERSION='2015-01-22 10:41:29 +0900 (9320435)'
 
 # Enables error checking if imosh is called in a script.
 if ! shopt login_shell >/dev/null; then
@@ -1193,6 +1193,89 @@ func::addslashes() {
   fi
 }
 
+# base64_decode -- Decodes data with MIME base64.
+#
+# Usage:
+#     // 1. Function form.
+#     void func::base64_decode(string* variable, string data)
+#     // 2. Command form.
+#     void sub::base64_decode(string data) > output
+#     // 3. Stream form.
+#     void stream::base64_decode() < input > output
+func::base64_decode() {
+  if [ "$#" -eq 2 ]; then
+    local __base64_decode_file=''
+    func::tmpfile __base64_decode_file
+    sub::print "${2}" | stream::base64_decode >"${__base64_decode_file}"
+    func::file_get_contents "${1}" "${__base64_decode_file}"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+sub::base64_decode() {
+  if [ "$#" -eq 1 ]; then
+    sub::print "${1}" | stream::base64_decode
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+stream::base64_decode() {
+  if [ "$#" -eq 0 ]; then
+    local __base64_decode_file=''
+    func::tmpfile __base64_decode_file
+    tr -cd '[:alnum:]/+' >"${__base64_decode_file}"
+    wc -c <"${__base64_decode_file}" >"${__base64_decode_file}.count"
+    local __base64_decode_count=0
+    func::file_get_contents \
+        __base64_decode_count "${__base64_decode_file}.count"
+    local __base64_decode_suffix='===='
+    sub::print "${__base64_decode_suffix:0:$(( 3 - (__base64_decode_count + 3) % 4 ))}" >>"${__base64_decode_file}"
+    base64 --decode -i "${__base64_decode_file}"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+# base64_encode -- Encodes data with MIME base64.
+#
+# Usage:
+#     // 1. Function form.
+#     void func::base64_encode(string* variable, string data)
+#     // 2. Command form.
+#     void sub::base64_encode(string data) > output
+#     // 3. Stream form.
+#     void stream::base64_encode() < input > output
+func::base64_encode() {
+  if [ "$#" -eq 2 ]; then
+    local __base64_encode_file=''
+    func::tmpfile __base64_encode_file
+    sub::print "${2}" | stream::base64_encode > "${__base64_encode_file}"
+    func::file_get_contents "${1}" "${__base64_encode_file}"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+sub::base64_encode() {
+  if [ "$#" -eq 1 ]; then
+    sub::print "${1}" | stream::base64_encode
+    sub::println
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+stream::base64_encode() {
+  if [ "$#" -eq 0 ]; then
+    # Remove newlines for compatibility.
+    openssl enc -e -base64 | tr -cd '[:print:]'
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
 # bin2hex -- Converts a binary string into hexadecimal representation.
 #
 # Converts binary data into hexadecimal representation.
@@ -2313,16 +2396,16 @@ imosh::internal::parse_args() {
   IMOSH_ARGV=()
   IMOSH_ARGS=()
   while [ "$#" != '0' ]; do
+    if sub::isset IMOSH_PREDICATE &&
+       [ "${upper_class_name}" = 'FLAG' ] &&
+       [ "${#IMOSH_ARGV}" -eq "${IMOSH_PREDICATE}" ]; then
+      IMOSH_ARGV+=("$@")
+      break
+    fi
     local arg="$1"
     shift
     if [ "${arg:0:1}" != '-' ]; then
       IMOSH_ARGV+=("${arg}")
-      if [ "${upper_class_name}" = 'FLAG' ] &&
-         sub::isset IMOSH_SKIP_EXTRA_OPTIONS &&
-         (( IMOSH_SKIP_EXTRA_OPTIONS )); then
-        IMOSH_ARGV+=("$@")
-        break
-      fi
       continue
     fi
     if [[ "${arg}" =~ ^-[0-9] ]]; then
@@ -2342,66 +2425,64 @@ imosh::internal::parse_args() {
       LOG FATAL "${class_name} name is bad: ${arg_name}"
     fi
     arg_value="${arg:${#arg_name}}"
-    if [ "${arg_value:0:1}" != '=' ]; then
-      if [ "${arg_name:0:2}" = 'no' ]; then
-        if sub::isset "${upper_class_name}S_${arg_name:2}"; then
-          if [ "${class_name}" != 'flag' ] || \
-             [ "$(imosh::internal::flag_type "${arg_name:2}")" = 'BOOL' ]; then
-            IMOSH_ARGS+=("${upper_class_name}S_${arg_name:2}=0")
-            continue
-          fi
+    # If the argument does not have "=", it should be a boolean flag or it
+    # should consume its next argument.
+    if [ "${arg_value:0:1}" = '=' ]; then
+      arg_value="${arg_value:1}"
+    # Preprocess for boolean flags (e.g. --name, --noname) and separated flags
+    # (e.g. --name value).
+    else
+      # If it is a negative boolean flag (--noname).
+      if [ "${arg_name:0:2}" = 'no' ] &&
+         sub::isset "${upper_class_name}S_${arg_name:2}" &&
+         ( [ "${class_name}" != 'flag' ] ||
+           [ "$(imosh::internal::flag_type "${arg_name:2}")" = 'BOOL' ] ); then
+        arg_name="${arg_name:2}"
+        arg_value=0
+      else
+        if ! sub::isset "${upper_class_name}S_${arg_name}"; then
+          LOG FATAL "no such bool ${class_name} is defined:" \
+                    "(${upper_class_name}S_)${arg_name}"
         fi
-      fi
-      if sub::isset "${upper_class_name}S_${arg_name}"; then
         if [ "${class_name}" != 'flag' ] ||
            [ "$(imosh::internal::flag_type "${arg_name}")" = 'BOOL' ]; then
-          IMOSH_ARGS+=("${upper_class_name}S_${arg_name}=1")
-          continue
-        fi
-      fi
-      if ! sub::isset "${upper_class_name}S_${arg_name}"; then
-        LOG FATAL "no such bool ${class_name} is defined:" \
-                  "(${upper_class_name}S_)${arg_name}"
-      fi
-      if [ "$#" -eq 0 ]; then
-        LOG FATAL "the ${arg_name} flag requires a value"
-      fi
-      arg_value="=${1}"
-      shift
-    fi
-    arg_value="${arg_value:1}"
-    if sub::isset "${upper_class_name}S_${arg_name}"; then
-      if [ "${class_name}" = 'flag' ]; then
-        local original_value="${arg_value}"
-        local type="$(imosh::internal::flag_type "${arg_name}")"
-        if [ "${type:0:5}" = 'MULTI' ]; then
-          # TODO(imos): Support delimiter.
-          func::explode arg_value ',' "${arg_value}"
-        fi
-        CHECK \
-            --message="${upper_class_name}S_${arg_name} is invalid: ${arg_value}" \
-            func::cast arg_value "$(imosh::internal::flag_type "${arg_name}")"
-        if [ "${type:0:5}" = 'MULTI' ]; then
-          # Set values here.  FLAGS_* are global variables, and this does not
-          # cause scope issues.
-          func::array_values "${upper_class_name}S_${arg_name}" arg_value
+          arg_value=1
         else
-          func::str_replace arg_value "'" "'\\''"
-          IMOSH_ARGS+=("${upper_class_name}S_${arg_name}='${arg_value}'")
+          if [ "$#" -eq 0 ]; then
+            LOG FATAL "the ${arg_name} flag requires a value"
+          fi
+          arg_value="${1}"
+          shift
         fi
-      else
-        func::str_replace arg_value "'" "'\\''"
-        IMOSH_ARGS+=("${upper_class_name}S_${arg_name}='${arg_value}'")
       fi
-      continue
     fi
-    LOG FATAL "no such ${class_name} is defined:" \
-              "(${upper_class_name}S_)${arg_name}"
+    if [ "${class_name}" = 'flag' ]; then
+      local type="$(imosh::internal::flag_type "${arg_name}")"
+      if [ "${type:0:5}" = 'MULTI' ]; then
+        # TODO(imos): Support delimiter.
+        func::explode arg_value ',' "${arg_value}"
+      fi
+      CHECK \
+          --message="${upper_class_name}S_${arg_name} is invalid: ${arg_value}" \
+          func::cast arg_value "$(imosh::internal::flag_type "${arg_name}")"
+      if [ "${type:0:5}" = 'MULTI' ]; then
+        # Set values here.  FLAGS_* are global variables, and this does not
+        # cause scope issues.
+        func::array_values "${upper_class_name}S_${arg_name}" arg_value
+        continue
+      fi
+    fi
+    if ! sub::isset "${upper_class_name}S_${arg_name}"; then
+      LOG FATAL "No such ${class_name} is defined: ${arg_name}"
+    fi
+    func::str_replace arg_value "'" "'\\''"
+    IMOSH_ARGS+=("${upper_class_name}S_${arg_name}='${arg_value}'")
   done
 }
 
 # __IMOSH_FLAGS_TYPE_<flag name>=<flag type>
 # __IMOSH_FLAGS_DESCRIPTION_<flag name>=<description>
+# __IMOSH_FLAGS_GROUP_<flag name>=<group>
 # __IMOSH_FLAGS_ALIASES=(from:to ...)
 
 imosh::internal::flag_type() {
@@ -2475,6 +2556,9 @@ imosh::internal::define_flag() {
       description+=" (Alias: --${ARGS_alias})"
     fi
     func::let "__IMOSH_FLAGS_DESCRIPTION_${name}" "${description}"
+    if [ "${group}" != 'IMOSH' -a "${group}" != 'MAIN' ]; then
+      func::let "__IMOSH_FLAGS_GROUP_${name}" "${group}"
+    fi
     __IMOSH_FLAGS+=("${group}:${name}")
   fi
 }
@@ -2534,7 +2618,7 @@ imosh::internal::flag_groups() {
   if (( main_group_exists )); then
     echo 'main'
   fi
-  if [ "${#groups[*]}" -ne 0 -a "${FLAGS_helpfull}" -ne 0 ]; then
+  if [ "${#groups[*]}" -ne 0 ]; then
     func::array_unique groups
     for group in "${groups[@]}"; do
       echo "${group}"
@@ -2651,6 +2735,19 @@ imosh::internal::init() {
   fi
   if (( FLAGS_help || FLAGS_helpfull )) ||
      [ "${FLAGS_help_format}" != '' ]; then
+    imosh::help
+    exit 0
+  fi
+}
+
+# imosh::help -- Shows help message.
+#
+# This shows a help message as --help flag does.
+#
+# Usage:
+#   void imosh::help()
+imosh::help() {
+  if [ "$#" -eq 0 ]; then
     if [ "${FLAGS_help_format}" = '' ]; then
       if [ -t 1 ]; then
         FLAGS_help_format='groff'
@@ -2665,7 +2762,8 @@ imosh::internal::init() {
     else
       __imosh::help >&2
     fi
-    exit 0
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
   fi
 }
 
