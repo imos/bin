@@ -33,7 +33,7 @@ add_readme() {
 
   echo '-----'
   echo "### ${file}"
-  if grep '^eval "\${IMOSH_INIT}"$' "${file}" >/dev/null; then
+  if grep 'eval "\${IMOSH_INIT}"$' "${file}" >/dev/null; then
     "./${file}" --help_format=markdown 2>&1 | while IFS= read -r line; do
       case "${line}" in
         '#'*) echo "###${line}";;
