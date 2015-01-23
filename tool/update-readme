@@ -41,8 +41,7 @@ add_readme() {
       esac
     done
   else
-    __imosh::show_usage \
-        --format=markdown --notitle --markdown_heading='##' "${file}"
+    sub::usage --format=markdown --notitle --markdown_heading='##' "${file}"
   fi
   echo
 }
