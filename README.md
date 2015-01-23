@@ -44,10 +44,12 @@ image, and imofs backs up the initial state and restores almost everything.
 Directories to backup/restore are specified as TARGETS, and services to
 backup/restore are specified as SERVICES.
 
+
 #### Usage
 ```sh
 imofs [options] command
 ```
+
 
 
 #### Command
@@ -62,6 +64,7 @@ imofs [options] command
       FLAGS_target_directory, and deploy files from FLAGS_source_directory to
       FLAGS_target_directory.
 
+
 #### Configurations
 * /backup/imofs/services
     * Services to backup/restore.  This file is updated when you call
@@ -70,7 +73,9 @@ imofs [options] command
     * Directories to backup/restore.  A directory should not end with "/".
 
 
+
 #### Options
+
 ##### main options
 * --backup_directory='/backup'
     * Directory to store backups.
@@ -85,6 +90,7 @@ imofs [options] command
 ### imos-archive
 imos-archive archives/dearchives files.
 
+
 #### Usage
 ```sh
 imos-crypt [options] [input output] ...
@@ -92,7 +98,9 @@ imos-crypt [options] [input output] ...
 
 
 
+
 #### Options
+
 ##### main options
 * --command=''
     * Command to run.
@@ -118,10 +126,12 @@ imos-aws options...
 ### imos-aws-credentials
 imos-aws-credentials shows AWS credentials.
 
+
 #### Usage
 ```sh
 imos-aws-credentials
 ```
+
 
 
 
@@ -149,6 +159,7 @@ installed password, which should be installed by imos-start.  The password
 flag forces the script to use the password given by the flag.  This script
 uses AES-256-CBC to encrypt/decrypt.
 
+
 #### Usage
 ```sh
 imos-crypt [options] [input output] ...
@@ -156,7 +167,9 @@ imos-crypt [options] [input output] ...
 
 
 
+
 #### Options
+
 ##### main options
 * --decrypt=false
     * Decrypt files.
@@ -173,6 +186,7 @@ imos-diskdiff compares disk volumes.
 
 imos-diskdiff compares disk volumes and list different files.
 
+
 #### Usage
 ```sh
 imos-diskdiff
@@ -180,7 +194,9 @@ imos-diskdiff
 
 
 
+
 #### Options
+
 ##### main options
 * --source='/Volumes/Ditto/'
     * Source volume.
@@ -191,6 +207,7 @@ imos-diskdiff
 ### imos-docker-run
 imos-archive archives/dearchives files.
 
+
 #### Usage
 ```sh
 imos-crypt [options] [input output] ...
@@ -198,7 +215,9 @@ imos-crypt [options] [input output] ...
 
 
 
+
 #### Options
+
 ##### main options
 * --command='su -'
     * Command to run inside docker.
@@ -218,10 +237,12 @@ imos-install is a script to configure imos-bin.
 imos-install configures user directories and installs an installed
 password if necessary.  This script requires the root privilege.
 
+
 #### Usage
 ```sh
 imos-install
 ```
+
 
 
 
@@ -231,10 +252,12 @@ imos-install
 ### imos-package
 imos-package manages binary packages.
 
+
 #### Usage
 ```sh
 imos-package command [options...]
 ```
+
 
 
 #### Command
@@ -252,6 +275,7 @@ imos-package command [options...]
 * download
     * Downloads a file from the cloud server.
 
+
 #### `create` command
 * `imos-package create ./a.out --foo --bar`
     * Archives files under the current directory with a command:
@@ -260,10 +284,12 @@ imos-package command [options...]
     * Archives files under the current directory with a command:
       `bash foo.sh`, and uploads the archive as a permanent archive.
 
+
 #### `upload` command
 Uploads a file to the cloud server. If the file's size is bigger than 1MB
 (specified by --fragment_size flag), the file will be split into fragments
 so as to speed up download/upload processes.
+
 
 #### Dependencies
 * create
@@ -272,7 +298,9 @@ so as to speed up download/upload processes.
     * Depends on download.
 
 
+
 #### Options
+
 ##### main options
 * --bucket='imos-package'
     * Bucket name.
@@ -292,6 +320,7 @@ so as to speed up download/upload processes.
     * Pass a caller's working directory to the program. Otherwise, a callee's working directory is under the package.
 * --threads=64
     * The number of threads to upload with.
+
 ##### UPLOAD options
 * --alias=''
     * Alias name of the package.
@@ -304,10 +333,13 @@ so as to speed up download/upload processes.
 ### imos-package-create
 imos-package-create creates a package.
 
+
 #### Usage
   imos-package-creates [options...] arguments...
 
+
 #### Options
+
 ##### main options
 * --alias=''
     * Alias name of the package.
@@ -326,10 +358,13 @@ imos-package-create creates a package.
 ### imos-package-download
 imos-package-download downloads a file from imos-package.
 
+
 #### Usage
   imos-package-download [options] file...
 
+
 #### Options
+
 ##### main options
 * --bucket='imos-package'
     * Bucket name.
@@ -346,10 +381,13 @@ imos-package-download downloads a file from imos-package.
 ### imos-package-run
 imos-package-create creates a package.
 
+
 #### Usage
   imos-package-creates [options...] arguments...
 
+
 #### Options
+
 ##### main options
 * --bucket='imos-package'
     * Bucket name.
@@ -364,10 +402,13 @@ imos-package-create creates a package.
 ### imos-package-upload
 imos-package-upload uploads files to package.imoz.jp.
 
+
 #### Usage
   imos-package-upload file...
 
+
 #### Options
+
 ##### main options
 * --alias=''
     * Alias name of the package.
@@ -403,10 +444,12 @@ imos-pokemon prints the current volume's Pokémon name/ID.
 For Mac OSX, this command uses a disk volume's name to determine Pokémon
 ID.  For linux OS, this command uses a primary IP address.
 
+
 #### Usage
 ```sh
 imos-pokemon [options]
 ```
+
 
 
 #### Files
@@ -416,7 +459,9 @@ imos-pokemon [options]
     * Mapping from Pokémon ID to Pokémon name.
 
 
+
 #### Options
+
 ##### main options
 * --cache=true
     * Use cache.
@@ -436,10 +481,12 @@ imos-start is a start-up script.
 imos-start is a script that should run just after boot programs.  This script
 requires the root privilege.
 
+
 #### Usage
 ```sh
 imos-start
 ```
+
 
 
 
@@ -453,6 +500,7 @@ imos-stat displays information about a file.  GNU's stat and BSD's stat use
 different format, so imos-stat converts GNU's format to BSD's format if
 necessary.
 
+
 #### Usage
 ```sh
 imos-stat --format=<format> <file>
@@ -460,7 +508,9 @@ imos-stat --format=<format> <file>
 
 
 
+
 #### Options
+
 ##### main options
 * --format=''
     * Format.
@@ -523,6 +573,7 @@ stelnet is used to communicate wit hanother host using the SSL protocol.
 stelnet requires the openssl command. If port is not specified, 443 (HTTPS)
 is used.
 
+
 #### Usage
 ```sh
 stelnet host [port]
@@ -530,7 +581,9 @@ stelnet host [port]
 
 
 
+
 #### Options
+
 ##### main options
 * --crlf=true
     * Use CRLF instead for new lines.
