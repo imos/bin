@@ -1,0 +1,6 @@
+DEFINE_string alias '' 'Alias name of the package.'
+DEFINE_int fragment_size "$(( 1024 * 1024 ))" 'Limit of fragment size.'
+DEFINE_string bucket 'imos-package' 'Bucket name.'
+DEFINE_string host 's3-ap-northeast-1.amazonaws.com' 'Host name.'
+DEFINE_int threads 64 'The number of threads to upload with.'
+DEFINE_string lifetime 'ephemeral' 'Lifetime of fragments.'
