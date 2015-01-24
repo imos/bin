@@ -1,11 +1,8 @@
 run() {
-  local tmporary_directory=''
-  func::tmpfile temporary_directory
-  mkdir -p "${temporary_directory}"
   local output_file=''
   func::tmpfile output_file
-  "$(dirname "${BASH_SOURCE}")/../imos-archive" \
-      --output="${output_file}" "$@"
+  "$(dirname "${BASH_SOURCE}")/../imos-package" archive \
+      --output "${output_file}" --logtostderr "$@"
   if [ "${#run_options[*]}" -ne 0 ]; then
     "${output_file}" "${run_options[@]}"
   else
@@ -13,9 +10,10 @@ run() {
   fi
 }
 
-test::imos-archive() {
+test::imos-package::archive() {
   local run_options=()
-  local sample_command="$(dirname "${BASH_SOURCE}")/imos-archive.sh"
+  local sample_command="$(dirname "${BASH_SOURCE}")/imos-package-archive.sh"
+  run --command='echo foo bar'
   EXPECT_EQ 'foo bar' "$(run --command='echo foo bar')"
   EXPECT_EQ 'foo bar' "$(run --command='echo foo bar' --file_size=1000000)"
   EXPECT_DEATH "$(run --command='echo foo bar' --file_size=1000)"

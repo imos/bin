@@ -1,5 +1,5 @@
 IMOSH_TESTING=1
-source "$(dirname "${BASH_SOURCE}")"/../imos-package-download || exit 1
+source "$(dirname "${BASH_SOURCE}")"/../imos-package || exit 1
 
 curl() {
   LOG INFO "Args: $*"
@@ -31,10 +31,10 @@ curl() {
 }
 
 run() {
-  main "$@"
+  imos-package::download "$@"
 }
 
-test::imos-package-download() {
+test::imos-package::download() {
   FLAGS_fragments_directory="${TMPDIR}/fragments"
   FLAGS_output="${TMPDIR}/output"
 

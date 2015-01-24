@@ -1,5 +1,5 @@
 IMOSH_TESTING=1
-source "$(dirname "${BASH_SOURCE}")"/../imos-package-upload || exit 1
+source "$(dirname "${BASH_SOURCE}")"/../imos-package || exit 1
 
 curl() {
   LOG INFO "Args: $*"
@@ -52,7 +52,7 @@ create_working_directory() {
 
 run() {
   true >"${TMPDIR}/imos-aws"
-  main "$@" >'/dev/null'
+  imos-package::upload "$@" >'/dev/null'
   cat "${TMPDIR}/imos-aws" | \
       stream::str_replace "${WORKING_DIRECTORY}" 'WORKING_DIRECTORY'
 }

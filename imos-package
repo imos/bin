@@ -74,7 +74,7 @@ create_tar() {
     local package_directory="${TMPDIR}/package"
     mkdir -p "${package_directory}"
     ln -s "$(pwd)" "${package_directory}/bin"
-    if [ "${archive_command}" != '' ]; then
+    if [ "${FLAGS_command}" != '' ]; then
       local command_file="${package_directory}/COMMAND"
       {
         sub::println '#!/bin/bash'
@@ -82,9 +82,9 @@ create_tar() {
           sub::println 'cd "$(dirname "${BASH_SOURCE}")/bin"'
         fi
         if (( FLAGS_extra_arguments )); then
-          sub::println "${archive_command} \"\$@\""
+          sub::println "${FLAGS_command} \"\$@\""
         else
-          sub::println "${archive_command}"
+          sub::println "${FLAGS_command}"
         fi
       } > "${command_file}"
       chmod +x "${command_file}"
@@ -145,21 +145,24 @@ exit 0
 }
 
 imos-package::archive() {
-  if [ "$#" -ge 1 ]; then
-    CHECK [ "${FLAGS_output}" != '' ]
-    CHECK [ "$#" -ne 0 ]
+  CHECK [ "${FLAGS_output}" != '' ]
+  if [ "$#" -eq 0 ]; then
+    if [ "${FLAGS_command}" = '' ]; then
+      LOG FATAL '--command flag or arguments must be specified.'
+    fi
+  else
+    if [ "${FLAGS_command}" != '' ]; then
+      LOG FATAL 'Both of --command flag and arguments are specified.'
+    fi
     local arguments=("$@")
     func::array_map arguments INPLACE func::escapeshellarg
-    local archive_command=''
-    func::implode archive_command ' ' arguments
-    local tar_file="${TMPDIR}/package.tar"
-    local sar_file="${TMPDIR}/package.sar"
-    create_tar "${tar_file}"
-    archive_tar "${tar_file}" "${sar_file}"
-    cp "${sar_file}" "${FLAGS_output}"
-  else
-    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+    func::implode FLAGS_command ' ' arguments
   fi
+  local tar_file="${TMPDIR}/package.tar"
+  local sar_file="${TMPDIR}/package.sar"
+  create_tar "${tar_file}"
+  archive_tar "${tar_file}" "${sar_file}"
+  cp "${sar_file}" "${FLAGS_output}"
 }
 
 ################################################################################
@@ -394,7 +397,7 @@ imos-package::download() {
 ################################################################################
 # bootstrap
 ################################################################################
-if ! sub::isset IMOSH_TESTING; then
+if [ "${#BASH_SOURCE[*]}" -eq 1 ]; then
   IMOSH_PREDICATE=2 eval "${IMOSH_INIT}"
   LOG INFO "Arguments: $*"
   if [ "$#" -eq 0 ] || [ "${1}" = 'help' ]; then
@@ -404,7 +407,7 @@ if ! sub::isset IMOSH_TESTING; then
   COMMAND="${1}"
   shift
   case "${COMMAND}" in
-    'create'|'run'|'download'|'upload')
+    'create'|'run'|'archive'|'download'|'upload')
       "imos-package::${COMMAND}" "$@";;
     *)
       LOG FATAL "Unknown command: ${COMMAND}";;
