@@ -13,7 +13,6 @@ run() {
 test::imos-package::archive() {
   local run_options=()
   local sample_command="$(dirname "${BASH_SOURCE}")/imos-package-archive.sh"
-  run --command='echo foo bar'
   EXPECT_EQ 'foo bar' "$(run --command='echo foo bar')"
   EXPECT_EQ 'foo bar' "$(run --command='echo foo bar' --file_size=1000000)"
   EXPECT_DEATH "$(run --command='echo foo bar' --file_size=1000)"
