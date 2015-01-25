@@ -324,6 +324,13 @@ package::split() {
     list_file="${fragments_directory}/${md5}"
     LOG INFO "$(ls -lA "${fragments_directory}/")"
     LOG INFO "List file: ${md5}"
+    if [ "${FLAGS_alias}" != '' ]; then
+      imos-aws s3api put-object \
+          --bucket "${FLAGS_bucket}" \
+          --key "${FLAGS_lifetime}/${FLAGS_alias}" \
+          --body "${list_file}" \
+          >'/dev/null' &
+    fi
     upload "${md5}" "${list_file}"
     wait
     sub::println "${md5}"
@@ -346,10 +353,35 @@ imos-package::upload() {
 ################################################################################
 # download command
 ################################################################################
+# Downloads a file from the cloud server.
+#
+# Usage:
+#     download_fragment input_path output_path
 download_fragment() {
+  if [ "$#" -eq 2 ]; then
+    LOG INFO "Downloading ${1}..."
+    local destination=''
+    func::tmpfile destination
+    curl --silent --fail --output "${destination}" \
+        "https://${FLAGS_host}/${FLAGS_bucket}/ephemeral/${1}" || \
+        curl --silent --fail --output "${destination}" \
+        "https://${FLAGS_host}/${FLAGS_bucket}/permanent/${1}" || \
+        LOG FATAL "Failed to find ${1}."
+    mv -f "${destination}" "${2}"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+fetch_fragment() {
   if [ "$#" -ge 1 ]; then
     local destination="${TMPDIR}/${1}"
     sub::println "${destination}"
+    if [ "${#1}" -ne 32 ] ||
+       ! sub::greg_match '+([0-9a-f])' "${1}"; then
+      download_fragment "${1}" "${destination}"
+      return
+    fi
     local cache=''
     if [ "${FLAGS_fragments_directory}" != '' ]; then
       mkdir -m 0777 -p "${FLAGS_fragments_directory}"
@@ -363,13 +395,7 @@ download_fragment() {
       LOG INFO "${1} was loaded from cache."
       return
     fi
-    LOG INFO "Downloading ${1}..."
-    curl --silent --fail --output "${destination}.tmp" \
-        "https://${FLAGS_host}/${FLAGS_bucket}/ephemeral/${1}" || \
-        curl --silent --fail --output "${destination}.tmp" \
-        "https://${FLAGS_host}/${FLAGS_bucket}/permanent/${1}" || \
-        LOG FATAL "Failed to find ${1}."
-    mv -f "${destination}.tmp" "${destination}"
+    download_fragment "${1}" "${destination}"
     if [ "$(cat "${destination}" | stream::md5)" != "${1}" ]; then
       LOG FATAL "Fragment ${1} is broken."
     fi
@@ -383,7 +409,7 @@ download_fragment() {
 
 imos-package::download() {
   if [ "$#" -eq 1 ]; then
-    local list_file="$(download_fragment "${1}")"
+    local list_file="$(fetch_fragment "${1}")"
     local output_file=''
     local fragment=''
     func::tmpfile output_file
@@ -391,7 +417,7 @@ imos-package::download() {
     while IFS= read -r fragment; do
       LOG INFO "Fragment: ${fragment}"
       if sub::greg_match '+([0-9a-f])' "${fragment}"; then
-        cat "$(download_fragment "${fragment}")" >>"${output_file}"
+        cat "$(fetch_fragment "${fragment}")" >>"${output_file}"
       fi
     done <"${list_file}"
     if [ "${FLAGS_output}" != '' ]; then
