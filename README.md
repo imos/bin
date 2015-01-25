@@ -22,10 +22,6 @@ Note that you can run the command multiple times safely.
 * [imos-docker-run](#imos-docker-run) ... imos-archive archives/dearchives files.
 * [imos-install](#imos-install) ... imos-install is a script to configure imos-bin.
 * [imos-package](#imos-package) ... imos-package manages binary packages.
-* [imos-package-create](#imos-package-create) ... imos-package-create creates a package.
-* [imos-package-download](#imos-package-download) ... imos-package-download downloads a file from imos-package.
-* [imos-package-run](#imos-package-run) ... imos-package-create creates a package.
-* [imos-package-upload](#imos-package-upload) ... imos-package-upload uploads files to package.imoz.jp.
 * [imos-passgen](#imos-passgen) ... imos-passgen is a password generator.
 * [imos-pokemon](#imos-pokemon) ... imos-pokemon prints the current volume's Pokémon name/ID.
 * [imos-start](#imos-start) ... imos-start is a start-up script.
@@ -289,6 +285,13 @@ imos-package command [options...]
 Uploads a file to the cloud server. If the file's size is bigger than 1MB
 (specified by --fragment_size flag), the file will be split into fragments
 so as to speed up download/upload processes.
+* `imos-package upload ./foo`
+    * Uploads `./foo` to the cloud server, and prints its file ID.
+
+
+#### `download` command
+Downloads a file from the cloud server and save it to the path specified by
+--output flag.
 
 
 #### Dependencies
@@ -304,22 +307,26 @@ so as to speed up download/upload processes.
 ##### main options
 * --bucket='imos-package'
     * Bucket name.
+* --host='s3-ap-northeast-1.amazonaws.com'
+    * Host name.
+* --output=''
+    * Path to output a file on.  archive and download commands use this flag.
+* --threads=64
+    * The number of threads to upload with.
+
+##### ARCHIVE options
 * --command=''
     * Command to run.
 * --extra_arguments=true
     * Append extra arguments.
 * --file_size=30000000
     * Maximum size of a generated archive in bytes.
-* --fragments_directory='/var/tmp/fragments'
-    * Cache directory.
-* --host='s3-ap-northeast-1.amazonaws.com'
-    * Host name.
-* --output=''
-    * Path to output a file on.  archive and download commands use this flag.
 * --pass_working_directory=false
     * Pass a caller's working directory to the program. Otherwise, a callee's working directory is under the package.
-* --threads=64
-    * The number of threads to upload with.
+
+##### DOWNLOAD options
+* --fragments_directory='/var/tmp/fragments'
+    * Cache directory.
 
 ##### UPLOAD options
 * --alias=''
@@ -328,100 +335,6 @@ so as to speed up download/upload processes.
     * Limit of fragment size.
 * --lifetime='ephemeral'
     * Lifetime of fragments.  ephemeral's lifetime is 7 days. Re-uploading the same fragments will prolong their lifetime.
-
------
-### imos-package-create
-imos-package-create creates a package.
-
-
-#### Usage
-  imos-package-creates [options...] arguments...
-
-
-#### Options
-
-##### main options
-* --alias=''
-    * Alias name of the package.
-* --bucket='imos-package'
-    * Bucket name.
-* --file_size=30000000
-    * Maximum size of a generated archive in bytes.
-* --host='s3-ap-northeast-1.amazonaws.com'
-    * Host name.
-* --lifetime='ephemeral'
-    * Lifetime of fragments.
-* --threads=64
-    * The number of threads to upload with.
-
------
-### imos-package-download
-imos-package-download downloads a file from imos-package.
-
-
-#### Usage
-  imos-package-download [options] file...
-
-
-#### Options
-
-##### main options
-* --bucket='imos-package'
-    * Bucket name.
-* --fragments_directory='/var/tmp/fragments'
-    * Cache directory.
-* --host='s3-ap-northeast-1.amazonaws.com'
-    * Host name.
-* --output=''
-    * Output path.
-* --threads=64
-    * The number of threads to upload with.
-
------
-### imos-package-run
-imos-package-create creates a package.
-
-
-#### Usage
-  imos-package-creates [options...] arguments...
-
-
-#### Options
-
-##### main options
-* --bucket='imos-package'
-    * Bucket name.
-* --fragments_directory='/var/tmp/fragments'
-    * Cache directory.
-* --host='s3-ap-northeast-1.amazonaws.com'
-    * Host name.
-* --threads=64
-    * The number of threads to upload with.
-
------
-### imos-package-upload
-imos-package-upload uploads files to package.imoz.jp.
-
-
-#### Usage
-  imos-package-upload file...
-
-
-#### Options
-
-##### main options
-* --alias=''
-    * Alias name of the package.
-* --bucket='imos-package'
-    * Bucket name.
-* --fragment_size=1048576
-    * Limit of fragment size.
-* --host='s3-ap-northeast-1.amazonaws.com'
-    * Host name.
-* --lifetime='ephemeral'
-    * Lifetime of fragments.
-* --threads=64
-    * The number of threads to upload with.
 
 -----
 ### imos-passgen

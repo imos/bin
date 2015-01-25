@@ -31,6 +31,12 @@
 # Uploads a file to the cloud server. If the file's size is bigger than 1MB
 # (specified by --fragment_size flag), the file will be split into fragments
 # so as to speed up download/upload processes.
+#   - `imos-package upload ./foo`
+#       Uploads `./foo` to the cloud server, and prints its file ID.
+#
+# `download` command:
+# Downloads a file from the cloud server and save it to the path specified by
+# --output flag.
 #
 # Dependencies:
 #   - create
@@ -47,12 +53,13 @@ DEFINE_string output '' \
     'Path to output a file on.  archive and download commands use this flag.'
 
 # Archive options.
-DEFINE_int file_size 30000000 'Maximum size of a generated archive in bytes.'
-DEFINE_bool pass_working_directory false \
+DEFINE_int --group='archive' file_size 30000000 \
+    'Maximum size of a generated archive in bytes.'
+DEFINE_bool --group='archive' pass_working_directory false \
     "Pass a caller's working directory to the program." \
     "Otherwise, a callee's working directory is under the package."
-DEFINE_string command '' 'Command to run.'
-DEFINE_bool extra_arguments true 'Append extra arguments.'
+DEFINE_string --group='archive' command '' 'Command to run.'
+DEFINE_bool --group='archive' extra_arguments true 'Append extra arguments.'
 
 # Upload options.
 DEFINE_string --group='upload' alias '' \
@@ -64,7 +71,8 @@ DEFINE_string --group='upload' lifetime 'ephemeral' \
     'Re-uploading the same fragments will prolong their lifetime.'
 
 # Download options.
-DEFINE_string fragments_directory '/var/tmp/fragments' 'Cache directory.'
+DEFINE_string --group='download' fragments_directory '/var/tmp/fragments' \
+    'Cache directory.'
 
 ################################################################################
 # archive command
