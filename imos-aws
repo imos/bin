@@ -5,6 +5,7 @@
 #     imos-aws options...
 
 source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
+IMOSH_PREDICATE=1 eval "${IMOSH_INIT}"
 
 mkdir "${TMPDIR}/.aws"
 sudo imos-aws-credentials > "${TMPDIR}/.aws/credentials"
