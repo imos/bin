@@ -431,7 +431,7 @@ imos-package::download() {
 ################################################################################
 # bootstrap
 ################################################################################
-if [ "${#BASH_SOURCE[*]}" -eq 1 ]; then
+if sub::is_main; then
   IMOSH_PREDICATE=2 eval "${IMOSH_INIT}"
   LOG INFO "Arguments: $*"
   if [ "$#" -eq 0 ] || [ "${1}" = 'help' ]; then
