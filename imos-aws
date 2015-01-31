@@ -9,5 +9,9 @@ IMOSH_PREDICATE=1 eval "${IMOSH_INIT}"
 
 mkdir "${TMPDIR}/.aws"
 sudo imos-aws-credentials > "${TMPDIR}/.aws/credentials"
-sub::println '[profile imos-package]' > "${TMPDIR}/.aws/config"
+{
+  sub::println '[default]'
+  sub::println 'output = json'
+  sub::println 'region = ap-northeast-1'
+} > "${TMPDIR}/.aws/config"
 HOME="${TMPDIR}" aws "$@"
