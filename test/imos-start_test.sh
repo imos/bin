@@ -1,8 +1,5 @@
 run() {
-  bash "$(dirname "${BASH_SOURCE}")"/imos-start.sh \
-      --alsologtostderr="${FLAGS_alsologtostderr}" \
-      --logtostderr="${FLAGS_logtostderr}" \
-      "$@"
+  bash "$(dirname "${BASH_SOURCE}")"/imos-start.sh "$@"
 }
 
 test::imos-start::darwin() {

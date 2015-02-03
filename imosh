@@ -3,7 +3,7 @@
 #
 # For more details, see https://github.com/imos/imosh
 
-IMOSH_VERSION='2015-02-01 22:48:52 +0900 (ee2e4e4)'
+IMOSH_VERSION='2015-02-03 10:24:58 +0900 (8dd26ee)'
 
 # Enables error checking if imosh is called in a script.
 if ! shopt login_shell >/dev/null; then
@@ -362,6 +362,184 @@ __func::quick_sort() {
   if ! sub::array_is_empty values3; then __sort_values+=("${values3[@]}"); fi
 }
 
+# date -- Format a local time/date.
+#
+# date formats a local time/date.
+#
+# Usage:
+#     void func::date(string* output, string format, int time)
+func::date() {
+  if [ "$#" -eq 3 ]; then
+    local __func_date_php="${2}"
+    local __func_date_c=''
+    local __func_date_buffer=''
+    while [ "${__func_date_php}" != '' ]; do
+      case "${__func_date_php}" in
+        'd'*)
+          __func_date_c+='%d'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'D'*)
+          __func_date_c+='%a'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'j'*)
+          __func_date_c+='%-d'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'l'*)
+          __func_date_c+='%A'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'N'*)
+          __func_date_c+='%u'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'w'*)
+          __func_date_c+='%w'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'z'*)
+          __func_date_c+='%-j'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'W'*)
+          __func_date_c+='%W'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'F'*)
+          __func_date_c+='%B'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'm'*)
+          __func_date_c+='%m'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'M'*)
+          __func_date_c+='%b'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'n'*)
+          __func_date_c+='%-m'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'o'*)
+          __func_date_c+='%G'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'Y'*)
+          __func_date_c+='%Y'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'y'*)
+          __func_date_c+='%y'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'a'*)
+          __func::date __func_date_buffer '%p' "${3}"
+          func::strtoupper __func_date_buffer
+          __func_date_c+="${__func_date_buffer}"
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'A'*)
+          __func_date_c+='%p'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'g'*)
+          __func_date_c+='%-I'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'G'*)
+          __func_date_c+='%-H'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'h'*)
+          __func_date_c+='%I'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'H'*)
+          __func_date_c+='%H'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'i'*)
+          __func_date_c+='%M'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        's'*)
+          __func_date_c+='%S'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'e'*|'T'*)
+          __func_date_c+='%Z'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'O'*)
+          __func_date_c+='%z'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'P'*)
+          __func::date __func_date_buffer '%z' "${3}"
+          __func_date_c+="${__func_date_buffer:0:3}:${__func_date_buffer:3}"
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'c'*)
+          __func_date_c+='%Y-%m-%dT%H:%M:%S'
+          __func::date __func_date_buffer '%z' "${3}"
+          __func_date_c+="${__func_date_buffer:0:3}:${__func_date_buffer:3}"
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'r'*)
+          __func_date_c+='%a, %d %b %Y %T %z'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        'U'*)
+          __func_date_c+='%s'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        '\%'*|'%'*)
+          __func_date_c+='%%'
+          __func_date_php="${__func_date_php:1}"
+          ;;
+        '\'*)
+          __func_date_c+="${__func_date_php:1:1}"
+          __func_date_php="${__func_date_php:2}"
+          ;;
+        *)
+          __func_date_c+="${__func_date_php:0:1}"
+          __func_date_php="${__func_date_php:1}"
+          ;;
+      esac
+    done
+    __func::date "${1}" "${__func_date_c}" "${3}"
+  elif [ "$#" -eq 2 ]; then
+    func::date "$@" "$(date +'%s')"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+sub::date() {
+  if [ "$#" -eq 1 -o "$#" -eq 2 ]; then
+    local __sub_date_result=''
+    func::date __sub_date_result "$@"
+    sub::println "${__sub_date_result}"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+__func::date() {
+  if [ "$#" -eq 3 ]; then
+    if [ "${UNAME}" = 'Linux' ]; then
+      func::let "${1}" "$(LC_ALL=C date --date="@${3}" "+${2}")"
+    else
+      func::let "${1}" "$(LC_ALL=C date -j -f '@%s' "@${3}" "+${2}")"
+    fi
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
 # strtotime -- Parses a datetime text into a UNIX timestamp.
 #
 # strtotime parses a datetime text into a UNIX timestamp.
@@ -504,6 +682,31 @@ __func::strtotime() {
     else
       func::let "${1}" "$(LC_ALL=C date -j -f "${3}" "${2}" '+%s')"
     fi
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+# time -- Returns current Unix timestamp.
+#
+# time returns current Unix timestamp.
+#
+# Usage:
+#     // 1. Function form.
+#     void func::time(string* result)
+#     // 2. Command form.
+#     void sub::time() > output
+func::time() {
+  if [ "$#" -eq 1 ]; then
+    sub::let "${1}" "$(date +'%s')"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+sub::time() {
+  if [ "$#" -eq 0 ]; then
+    date +'%s'
   else
     eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
   fi
@@ -872,8 +1075,8 @@ sub::getmypid() {
 sub::is_main() {
   if [ "$#" -eq 0 ]; then
     local __is_main_depth="${#BASH_SOURCE[*]}"
-    if [ "${BASH_SOURCE[0]}" = \
-         "${BASH_SOURCE[$((__is_main_depth - 2))]}" ]; then
+    if [ "${BASH_SOURCE[1]}" = \
+         "${BASH_SOURCE[$((__is_main_depth - 1))]}" ]; then
       return 0
     else
       return 1
@@ -2297,6 +2500,170 @@ EXPECT_FALSE() {
   LOG INFO 'EXPECT_FALSE passes:' "$@"
 }
 
+# EXPECT_GE -- Expects first one is greater than or equal to second one.
+#
+# EXPECT_GE expects first one is greater than or equal to second one.
+#
+# Usage:
+#     void EXPECT_GE(string target, string actual)
+#     void EXPECT_STRGE(string target, string actual)
+EXPECT_GE() {
+  if [ "$#" -eq 2 ]; then
+    if [ "$1" -lt "$2" ]; then
+      echo "Actual: $2" >&2
+      echo "Target: $1" >&2
+      FAILURE
+    fi
+    LOG INFO "EXPECT_GE passes: '$1' >= '$2'"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+EXPECT_STRGE() {
+  if [ "$#" -eq 2 ]; then
+    if [ "$1" \< "$2" ]; then
+      echo "Actual: $2" >&2
+      echo "Target: $1" >&2
+      FAILURE
+    fi
+    LOG INFO "EXPECT_STRGE passes: '$1' >= '$2'"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+ASSERT_GE() {
+  __ASSERT EXPECT_GE "$@"
+}
+
+ASSERT_STRGE() {
+  __ASSERT EXPECT_STRGE "$@"
+}
+
+# EXPECT_GT -- Expects first one is greater than second one.
+#
+# EXPECT_GT expects first one is greater than second one.
+#
+# Usage:
+#     void EXPECT_GT(string target, string actual)
+#     void EXPECT_STRGT(string target, string actual)
+EXPECT_GT() {
+  if [ "$#" -eq 2 ]; then
+    if [ "$1" -le "$2" ]; then
+      echo "Actual: $2" >&2
+      echo "Target: $1" >&2
+      FAILURE
+    fi
+    LOG INFO "EXPECT_GT passes: '$1' > '$2'"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+EXPECT_STRGT() {
+  if [ "$#" -eq 2 ]; then
+    if [ "$1" \<= "$2" ]; then
+      echo "Actual: $2" >&2
+      echo "Target: $1" >&2
+      FAILURE
+    fi
+    LOG INFO "EXPECT_STRGT passes: '$1' > '$2'"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+ASSERT_GT() {
+  __ASSERT EXPECT_GT "$@"
+}
+
+ASSERT_STRGT() {
+  __ASSERT EXPECT_STRGT "$@"
+}
+
+# EXPECT_LE -- Expects first one is less than or equal to second one.
+#
+# EXPECT_LE expects first one is less than or equal to second one.
+#
+# Usage:
+#     void EXPECT_LE(string target, string actual)
+#     void EXPECT_STRLE(string target, string actual)
+EXPECT_LE() {
+  if [ "$#" -eq 2 ]; then
+    if [ "$1" -gt "$2" ]; then
+      echo "Actual: $2" >&2
+      echo "Target: $1" >&2
+      FAILURE
+    fi
+    LOG INFO "EXPECT_LE passes: '$1' <= '$2'"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+EXPECT_STRLE() {
+  if [ "$#" -eq 2 ]; then
+    if [ "$1" \> "$2" ]; then
+      echo "Actual: $2" >&2
+      echo "Target: $1" >&2
+      FAILURE
+    fi
+    LOG INFO "EXPECT_STRLE passes: '$1' <= '$2'"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+ASSERT_LE() {
+  __ASSERT EXPECT_LE "$@"
+}
+
+ASSERT_STRLE() {
+  __ASSERT EXPECT_STRLE "$@"
+}
+
+# EXPECT_LT -- Expects first one is less than second one.
+#
+# EXPECT_LT expects first one is less than second one.
+#
+# Usage:
+#     void EXPECT_LT(string target, string actual)
+#     void EXPECT_STRLT(string target, string actual)
+EXPECT_LT() {
+  if [ "$#" -eq 2 ]; then
+    if [ "$1" -ge "$2" ]; then
+      echo "Actual: $2" >&2
+      echo "Target: $1" >&2
+      FAILURE
+    fi
+    LOG INFO "EXPECT_LT passes: '$1' < '$2'"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+EXPECT_STRLT() {
+  if [ "$#" -eq 2 ]; then
+    if [ "$1" \>= "$2" ]; then
+      echo "Actual: $2" >&2
+      echo "Target: $1" >&2
+      FAILURE
+    fi
+    LOG INFO "EXPECT_STRLT passes: '$1' < '$2'"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+ASSERT_LT() {
+  __ASSERT EXPECT_LT "$@"
+}
+
+ASSERT_STRLT() {
+  __ASSERT EXPECT_STRLT "$@"
+}
+
 # EXPECT_NE -- Expects two arguments are not equal.
 #
 # EXPECT_NE expects two arguments are not equal.
@@ -2359,6 +2726,99 @@ __ASSERT() {
     exit 1
   fi
   IMOSH_TEST_IS_FAILED="${last_state}"
+}
+
+# test_file -- Tests a file.
+#
+# test_file tests test cases in a file.
+#
+# Usage:
+#     void imosh::test_file(string file_path)
+imosh::test_case() {
+  if [ "$#" -eq 1 ]; then
+    IMOSH_TEST_IS_FAILED=0
+    "test::${1}"
+    (( ! IMOSH_TEST_IS_FAILED )) || exit 1
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+imosh::test_file() {
+  if [ "$#" -eq 1 ]; then
+    sub::print   "${IMOSH_COLOR_GREEN}[==========]" >&2
+    sub::println "${IMOSH_STYLE_DEFAULT} Running tests for ${1}." >&2
+    IMOSH_TESTING=0 source "${1}" || exit 1
+    ( ( declare -F | grep 'test::' ) || true ) >"${IMOSH_TMPDIR}/test_func"
+    if [ "$(cat "${IMOSH_TMPDIR}/test_func")" == '' ]; then
+      LOG FATAL "${1} has no test."
+    fi
+    exec 3>&2
+    while read line; do
+      function="${line##*test::}"
+      sub::print   "${IMOSH_COLOR_GREEN}[ RUN      ]" >&2
+      sub::println "${IMOSH_STYLE_DEFAULT} ${function}" >&2
+      {
+        time -p {
+          imosh::test_case "${function}" 2>&1 &
+          wait $!
+        }
+      } 2>"${IMOSH_TMPDIR}/time" \
+        1>"${IMOSH_TMPDIR}/stdout" &
+      if wait $!; then
+        func::file_get_contents time "${IMOSH_TMPDIR}/time"
+        func::greg_replace time '+([[:space:]])' ' '
+        func::trim time
+        sub::print   "${IMOSH_COLOR_GREEN}[       OK ]" >&2
+        sub::println "${IMOSH_STYLE_DEFAULT} ${function} (${time})" >&2
+      else
+        cat "${IMOSH_TMPDIR}/stdout"
+        func::file_get_contents time "${IMOSH_TMPDIR}/time"
+        func::greg_replace time '+([[:space:]])' ' '
+        func::trim time
+        sub::print   "${IMOSH_COLOR_RED}[  FAILED  ]" >&2
+        sub::println "${IMOSH_STYLE_DEFAULT} ${function} (${time})" >&2
+        IMOSH_TEST_IS_FAILED=1
+      fi
+    done <"${IMOSH_TMPDIR}/test_func"
+  else
+    eval "${IMOSH_WRONG_NUMBER_OF_ARGUMENTS}"
+  fi
+}
+
+imosh::test_files() {
+  local IMOSH_TEST_IS_FAILED=0
+  if [ "$#" -eq 1 ]; then
+    imosh::test_file "${1}"
+  else
+    local ppid=()
+    local files=()
+    local file=''
+    local index=0
+    for file in "$@"; do
+      sub::throttle 4
+      "${BASH}" "${BASH_SOURCE}" "${file}" \
+          >"${IMOSH_TMPDIR}/test_index_${index}.stdout" \
+          2>"${IMOSH_TMPDIR}/test_index_${index}.stderr" &
+      ppid+=("$!")
+      files+=("${file}")
+      (( index += 1 ))
+    done
+    index=0
+    while [ "${index}" -lt "${#ppid[*]}" ]; do
+      if ! wait "${ppid[${index}]}"; then
+        IMOSH_TEST_IS_FAILED=1
+        LOG ERROR "${files[${index}]} failed."
+      fi
+      cat "${IMOSH_TMPDIR}/test_index_${index}.stdout"
+      cat "${IMOSH_TMPDIR}/test_index_${index}.stderr" >&2
+      sub::println
+      (( index += 1 ))
+    done
+  fi
+  if (( IMOSH_TEST_IS_FAILED )); then
+    exit 1
+  fi
 }
 
 # boolval -- Casts a variable as a boolean value.
@@ -3181,6 +3641,7 @@ if sub::isset IMOSH_USE_DEFINE_FLAGS && (( IMOSH_USE_DEFINE_FLAGS )); then
   DEFINE_string --group=imosh 'imosh_test' '' \
       'Test files to test.'
 else
+  :
 
 # This is automatically generated by print-flag-variables.
 FLAGS_alsologtostderr=0
@@ -3223,4 +3684,9 @@ __IMOSH_FLAGS_TYPE_stacktrace_threshold=STRING
 fi
 
 __IMOSH_IS_LOADED=1
+
+if sub::is_main; then
+  eval "${IMOSH_INIT}"
+  imosh::test_files "$@"
+fi
 

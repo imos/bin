@@ -18,7 +18,7 @@ service() {
     local command="$2"
     case "${command}" in
       status)
-        if ! func::isset "SERVICE_${service}"; then
+        if ! sub::isset "SERVICE_${service}"; then
           LOG ERROR "Unrecognized service: ${service}"
           return 1
         fi

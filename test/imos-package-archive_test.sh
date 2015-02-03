@@ -2,7 +2,7 @@ run() {
   local output_file=''
   func::tmpfile output_file
   pushd "$(dirname "${BASH_SOURCE}")" >'/dev/null'
-  ../imos-package archive --output "${output_file}" --logtostderr "$@"
+  ../imos-package archive --output "${output_file}" "$@"
   popd >'/dev/null'
   if [ "${#run_options[*]}" -ne 0 ]; then
     "${output_file}" "${run_options[@]}"

@@ -1,8 +1,5 @@
 run() {
-  bash "$(dirname "${BASH_SOURCE}")"/imos-install.sh \
-      --alsologtostderr="${FLAGS_alsologtostderr}" \
-      --logtostderr="${FLAGS_logtostderr}" \
-      "$@"
+  bash "$(dirname "${BASH_SOURCE}")"/imos-install.sh "$@"
 }
 
 test::imos-install::darwin() {
