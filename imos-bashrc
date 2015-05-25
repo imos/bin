@@ -59,7 +59,7 @@ __bashrc::init() {
   shopt -u histappend
   export HISTSIZE=999999
   export HISTCONTROL=ignoreboth
-  export HISTIGNORE="history *:cd *:ls *:python:env"
+  export HISTIGNORE="history *:history:cd *:cd:ls *:ls:python:env"
 }
 
 __bashrc::init
