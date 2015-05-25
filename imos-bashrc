@@ -58,6 +58,8 @@ __bashrc::init() {
   PROMPT_COMMAND='history -a; history -c; history -r;'
   shopt -u histappend
   export HISTSIZE=999999
+  export HISTCONTROL=ignoreboth
+  export HISTIGNORE="history *:cd *:ls *:python:env"
 }
 
 __bashrc::init
