@@ -55,6 +55,9 @@ __bashrc::init() {
   if [ -f "${target}" ]; then
     source "${target}"
   fi
+  PROMPT_COMMAND='history -a; history -c; history -r;'
+  shopt -u histappend
+  export HISTSIZE=999999
 }
 
 __bashrc::init
