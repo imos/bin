@@ -78,6 +78,18 @@ pokemon::darwin() {
 }
 
 pokemon::linux() {
+  if sub::isset NINECLUSTER; then
+    case "${NINECLUSTER}" in
+      'ninemaster')
+        sub::println 'Dugtrio';;
+      'ninelet')
+        sub::println 'Diglett';;
+      *)
+        LOG "${FLAGS_pokemon_error_level}" 'resolution failed.'
+        sub::println 'Unown';;
+    esac
+    return
+  fi
   case "$(hostname -i)" in
     '153.121.64.206')
       sub::println 'Dunsparce';;
