@@ -14,7 +14,11 @@ IMOSH_PREDICATE=1 eval "${IMOSH_INIT}"
 
 run() {
   LOG INFO "Command: $*"
-  local args=(ssh -o 'StrictHostKeyChecking no'
+  imos-crypt --decrypt --installed_password \
+      "${IMOS_BIN}/data/ninelet.aes256" "${TMPDIR}/id_rsa"
+  chmod 0700 "${TMPDIR}/id_rsa"
+  local args=(ssh -i "${TMPDIR}/id_rsa"
+                  -o 'StrictHostKeyChecking no'
                   -o 'UserKnownHostsFile /dev/null'
                   -o 'ConnectTimeout 1')
   if (( FLAGS_tty )); then
