@@ -1,0 +1,65 @@
+#!/bin/bash
+# ninelet runs a command on a ninelet.
+#
+# Usage:
+#     ninelet [options] args...
+
+source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
+DEFINE_bool debug false 'Enables debug mode.'
+DEFINE_bool tty false 'Enables tty.'
+DEFINE_string ninelet_list \
+    'http://ninecluster.s3-website-ap-northeast-1.amazonaws.com/ninelet.txt' \
+    'URL containing a list of ninelet ports.'
+IMOSH_PREDICATE=1 eval "${IMOSH_INIT}"
+
+run() {
+  LOG INFO "Command: $*"
+  local args=(ssh -o 'StrictHostKeyChecking no'
+                  -o 'UserKnownHostsFile /dev/null'
+                  -o 'ConnectTimeout 1')
+  if (( FLAGS_tty )); then
+    args+=(-t -t)
+  fi
+  local timeout="$(( SECONDS + 10 ))"
+  local targets=()
+  local host='' port=''
+  while IFS=: read host port; do
+    targets+=("${RANDOM}:-p ${port} ninelet@${host}")
+  done < <(curl --silent "${FLAGS_ninelet_list}")
+  func::sort targets
+  local target=''
+  for target in "${targets[@]}"; do
+    target="${target#*:}"
+    local status=0
+    "${args[@]}" ${target} "$@" || status="$?"
+    LOG INFO "Status: ${status}"
+    if [ "${status}" -ne 255 ]; then
+      exit "${status}"
+    fi
+    if (( timeout < SECONDS )); then
+      exit 255
+    fi
+  done
+  LOG FATAL 'No available ninelet server is found.'
+}
+
+main() {
+  local command=''
+  for arg in "$@"; do
+    func::escapeshellarg arg
+    command+=" ${arg}"
+  done
+
+  if [ "${command}" == '' ]; then
+    run
+  elif (( FLAGS_debug )); then
+    run "${command}"
+  else
+    command="echo BEGIN >&2; ${command}"
+    mkfifo "${TMPDIR}/stderr"
+    grep -A -1 BEGIN <"${TMPDIR}/stderr" | tail -n +2 >&2 &
+    run "${command}" 2>"${TMPDIR}/stderr"
+  fi
+}
+
+main "$@"
