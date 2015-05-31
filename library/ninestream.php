@@ -83,6 +83,10 @@ class NineStream {
     while (TRUE) {
       $stdin = $this->streams[-1]->stdout;
       $stdout = $this->streams[-1]->stdin;
+      if (posix_isatty($stdin) && posix_isatty($stdout)) {
+        fwrite(STDOUT, '> ');
+        fflush(STDOUT);
+      }
       $buffer = '';
       while (TRUE) {
         stream_set_blocking($stdin, TRUE);
@@ -125,6 +129,12 @@ class NineStream {
     $args = explode(' ', $command);
     $command = array_shift($args);
     switch (strtolower($command)) {
+      case 'help':
+        $commands = ['set', 'get', 'config', 'run', 'exec',
+                     'stream', 'write', 'writeall', 'close', 'closeall'];
+        sort($commands);
+        array_unshift($commands, 'OK');
+        return implode(' ', $commands);
       case 'set':
         if (count($args) < 2) {
           return 'BAD_REQUEST run requires 2+ arguments, but ' .
@@ -137,6 +147,30 @@ class NineStream {
         }
         $CONFIG[$key] = $value;
         return 'OK';
+      case 'get':
+        if (count($args) != 1) {
+          return 'BAD_REQUEST get requires exactly one argument, but ' .
+                 count($args) . '.';
+        }
+        $key = array_shift($args);
+        if (!isset($CONFIG[$key])) {
+          return "NOT_FOUND No such a config: $key";
+        }
+        return "OK $CONFIG[$key]";
+      case 'config':
+        $pattern = '*';
+        if (count($args) > 0) {
+          $pattern = implode(' ', $args);
+        }
+        $pattern = '/^' . strtr(preg_quote($pattern, '/'),
+                                ['\\*' => '.*', '\\?' => '.']) . '$/';
+        $keys = ['OK'];
+        foreach (array_keys($CONFIG) as $key) {
+          if (preg_match($pattern, $key)) {
+            $keys[] = $key;
+          }
+        }
+        return implode(' ', $keys);
       case 'run':
         if (count($args) < 2) {
           return 'BAD_REQUEST run requires 2+ arguments, but ' .
@@ -202,6 +236,9 @@ class NineStream {
           $read = array_pop($reads);
           foreach ($this->streams as $id => $stream) {
             if ($read == $stream->stdout) break;
+          }
+          if (!isset($this->buffers[$id])) {
+            $this->buffers[$id] = '';
           }
           $this->buffers[$id] .= fgets($read);
           if (substr($this->buffers[$id], -1) == "\n") break;
