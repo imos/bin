@@ -1,0 +1,66 @@
+#!/bin/bash
+# ninestream runs a command on a ninelet.
+#
+# Usage:
+#     ninelet [options] args...
+
+source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
+DEFINE_string worker '' 'Command as a worker.'
+DEFINE_string controller '' 'Command as a controller.'
+DEFINE_int replicas 0 'The number of replicas.'
+DEFINE_bool worker_stderr true "Output workers' stderr."
+eval "${IMOSH_INIT}"
+
+run() {
+  LOG INFO "Command: $*"
+  imos-crypt --decrypt --installed_password \
+      "${IMOS_BIN}/data/ninelet.aes256" "${TMPDIR}/id_rsa"
+  chmod 0700 "${TMPDIR}/id_rsa"
+  local args=(ssh -i "${TMPDIR}/id_rsa"
+                  -o 'StrictHostKeyChecking no'
+                  -o 'UserKnownHostsFile /dev/null'
+                  -o 'ConnectTimeout 1')
+  if (( FLAGS_tty )); then
+    args+=(-t -t)
+  fi
+  local timeout="$(( SECONDS + 10 ))"
+  local targets=()
+  local host='' port=''
+  while IFS=: read host port; do
+    targets+=("${RANDOM}:-p ${port} ninelet@${host}")
+  done < <(curl --silent "${FLAGS_ninelet_list}")
+  func::sort targets
+  local target=''
+  for target in "${targets[@]}"; do
+    target="${target#*:}"
+    local status=0
+    "${args[@]}" ${target} "$@" || status="$?"
+    LOG INFO "Status: ${status}"
+    if [ "${status}" -ne 255 ]; then
+      exit "${status}"
+    fi
+    if (( timeout < SECONDS )); then
+      exit 255
+    fi
+  done
+  LOG FATAL 'No available ninelet server is found.'
+}
+
+main() {
+  if [ "${FLAGS_worker}" == '' ]; then
+    LOG FATAL '--worker command must be specifiyed.'
+  fi
+  if [ "${FLAGS_controller}" == '' ]; then
+    LOG FATAL '--controller command must be specifiyed.'
+  fi
+  if [ "${FLAGS_replicas}" -lt 1 ]; then
+    LOG FATAL '--replicas must be larger than 0.'
+  fi
+  php "${IMOS_BIN}/library/ninestream.php" <<EOM >'/dev/null'
+set worker.stderr ${FLAGS_worker_stderr}
+run ${FLAGS_replicas} ${FLAGS_worker}
+exec ${FLAGS_controller}
+EOM
+}
+
+main "$@"
