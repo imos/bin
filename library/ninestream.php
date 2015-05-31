@@ -1,6 +1,9 @@
 <?php
 
-$CONFIG = ['worker.stderr' => '1'];
+$CONFIG = [
+    'worker.stderr' => '1',
+    'controller.debug' => '0',
+];
 
 class Stream {
   public function __construct($command) {
@@ -75,10 +78,12 @@ class NineStream {
   }
 
   public function Start() {
+    global $CONFIG;
     $this->streams = [-1 => new Stream(NULL)];
     while (TRUE) {
-      $buffer = '';
       $stdin = $this->streams[-1]->stdout;
+      $stdout = $this->streams[-1]->stdin;
+      $buffer = '';
       while (TRUE) {
         stream_set_blocking($stdin, TRUE);
         $buffer .= fgets($stdin);
@@ -87,6 +92,10 @@ class NineStream {
         }
       }
       $buffer = rtrim($buffer, "\r\n");
+      if ($stdout != STDOUT && boolval($CONFIG['controller.debug'])) {
+        fwrite(STDOUT, "> $buffer\n");
+        fflush(STDOUT);
+      }
       if (preg_match('%^exit(?:| (\d+))$%', $buffer, $match)) {
         exit(isset($match[1]) ? intval($match[1]) : 0);
       }
@@ -95,12 +104,15 @@ class NineStream {
         fflush(STDERR);
         exit(1);
       }
-      $stdout = $this->streams[-1]->stdin;
       $result = strtr($this->Command($buffer), ["\r" => '', "\n" => '']);
       fwrite($stdout, "$result\n");
       fflush($stdout);
       if (isset($this->streams[-2])) {
         unset($this->streams[-2]);
+      }
+      if ($stdout != STDOUT && boolval($CONFIG['controller.debug'])) {
+        fwrite(STDOUT, "$result\n");
+        fflush(STDOUT);
       }
     }
   }
