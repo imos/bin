@@ -55,11 +55,9 @@ __bashrc::init() {
   if [ -f "${target}" ]; then
     source "${target}"
   fi
-  PROMPT_COMMAND='history -a && history -c && history -r || true'
   shopt -u histappend
   export HISTSIZE=999999
   export HISTCONTROL=ignoreboth
-  export HISTIGNORE="history *:history:cd *:cd:ls *:ls:python:env"
 }
 
 __bashrc::init

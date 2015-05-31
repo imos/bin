@@ -61,7 +61,8 @@ main() {
   else
     command="echo BEGIN >&2; ${command}"
     mkfifo "${TMPDIR}/stderr"
-    grep -A 1000000000 BEGIN <"${TMPDIR}/stderr" | tail -n +2 >&2 &
+    grep --line-buffered -A 1000000000 BEGIN <"${TMPDIR}/stderr" | \
+        tail -n +2 >&2 &
     run "${command}" 2>"${TMPDIR}/stderr"
   fi
 }
