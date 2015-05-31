@@ -87,11 +87,13 @@ class NineStream {
         }
       }
       $buffer = rtrim($buffer, "\r\n");
-      if ($buffer == 'exit') {
-        break;
+      if (preg_match('%^exit(?:| (\d+))$%', $buffer, $match)) {
+        exit(isset($match[1]) ? intval($match[1]) : 0);
       }
       if ($buffer == '' && feof($stdin)) {
-        break;
+        fwrite(STDERR, "Controller stream exited without calling exit.\n");
+        fflush(STDERR);
+        exit(1);
       }
       $stdout = $this->streams[-1]->stdin;
       $result = strtr($this->Command($buffer), ["\r" => '', "\n" => '']);
