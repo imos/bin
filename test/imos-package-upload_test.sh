@@ -105,27 +105,29 @@ test::imos-package-upload() {
       "$(cat "${WORKING_DIRECTORY}/6fe45f263f52b46265af688d4e26a3d6")"
   FLAGS_fragment_size=100
   EXPECT_EQ "$(
-      echo s3api put-object \
-          --bucket imos-package \
-          --key ephemeral/b8465f50d9579a17a918285548090783 \
-          --content-md5 uEZfUNlXmhepGChVSAkHgw== \
-          --body WORKING_DIRECTORY/b8465f50d9579a17a918285548090783
-      echo s3api put-object \
-          --bucket imos-package \
-          --key ephemeral/bcab5aa38bd1777c2cdbc1b79cee353f \
-          --content-md5 vKtao4vRd3ws28G3nO41Pw== \
-          --body WORKING_DIRECTORY/bcab5aa38bd1777c2cdbc1b79cee353f
-      echo s3api put-object \
-          --bucket imos-package \
-          --key ephemeral/c4095b9c7c0a5d8dc6472ecb3fb7395e \
-          --content-md5 xAlbnHwKXY3GRy7LP7c5Xg== \
-          --body WORKING_DIRECTORY/c4095b9c7c0a5d8dc6472ecb3fb7395e
-      echo s3api put-object \
-          --bucket imos-package \
-          --key ephemeral/0982e972bf2e287852c958582b0e4364 \
-          --content-md5 CYLpcr8uKHhSyVhYKw5DZA== \
-          --body WORKING_DIRECTORY/0982e972bf2e287852c958582b0e4364)" \
-    "$(run "${target}")"
+      {
+        echo s3api put-object \
+            --bucket imos-package \
+            --key ephemeral/b8465f50d9579a17a918285548090783 \
+            --content-md5 uEZfUNlXmhepGChVSAkHgw== \
+            --body WORKING_DIRECTORY/b8465f50d9579a17a918285548090783
+        echo s3api put-object \
+            --bucket imos-package \
+            --key ephemeral/bcab5aa38bd1777c2cdbc1b79cee353f \
+            --content-md5 vKtao4vRd3ws28G3nO41Pw== \
+            --body WORKING_DIRECTORY/bcab5aa38bd1777c2cdbc1b79cee353f
+        echo s3api put-object \
+            --bucket imos-package \
+            --key ephemeral/c4095b9c7c0a5d8dc6472ecb3fb7395e \
+            --content-md5 xAlbnHwKXY3GRy7LP7c5Xg== \
+            --body WORKING_DIRECTORY/c4095b9c7c0a5d8dc6472ecb3fb7395e
+        echo s3api put-object \
+            --bucket imos-package \
+            --key ephemeral/0982e972bf2e287852c958582b0e4364 \
+            --content-md5 CYLpcr8uKHhSyVhYKw5DZA== \
+            --body WORKING_DIRECTORY/0982e972bf2e287852c958582b0e4364
+      } | sort)" \
+    "$(run "${target}" | sort)"
   EXPECT_EQ 'd632eba71107bf7bc3ec423eab256d78' \
       "$({
               cat "${WORKING_DIRECTORY}/c4095b9c7c0a5d8dc6472ecb3fb7395e"

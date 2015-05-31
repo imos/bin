@@ -315,7 +315,6 @@ package::split() {
       fi
       sub::println "${md5}" >> "${list_file}"
     done
-    func::sort files
     for md5 in "${files[@]}"; do
       sub::throttle "${FLAGS_threads}"
       upload "${md5}" "${fragments_directory}/${md5}" &
