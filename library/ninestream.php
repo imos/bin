@@ -39,7 +39,21 @@ class Stream {
     $this->Close();
   }
 
+  public function Kill() {
+    if (is_null($this->process)) return;
+    for ($i = 0; $i < 10; $i++) {
+      $status = proc_get_status($this->process);
+      if (!$status['running']) return;
+      if ($i == 0) {
+        posix_kill($status['pid'], @constant('SIGTERM') ?: 15);
+      }
+      usleep(1000 << $i);
+    }
+    posix_kill($status['pid'], @constant('SIGKILL') ?: 9);
+  }
+
   public function Close() {
+    $this->Kill();
     if (!is_null($this->stdin) && $this->stdin != STDOUT) {
       fclose($this->stdin);
       $this->stdin = NULL;
