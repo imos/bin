@@ -80,10 +80,16 @@ class NineStream {
   public function Start() {
     global $CONFIG;
     $this->streams = [-1 => new Stream(NULL)];
+    if (getenv('NINESTREAM_INIT') !== FALSE) {
+      $init_commands = trim(file_get_contents(getenv('NINESTREAM_INIT')));
+      foreach (explode("\n", $init_commands) as $command) {
+        $this->Command($command);
+      }
+    }
     while (TRUE) {
       $stdin = $this->streams[-1]->stdout;
       $stdout = $this->streams[-1]->stdin;
-      if (posix_isatty($stdin) && posix_isatty($stdout)) {
+      if (@posix_isatty($stdin) && @posix_isatty($stdout)) {
         fwrite(STDOUT, '> ');
         fflush(STDOUT);
       }
