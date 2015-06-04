@@ -39,13 +39,29 @@ class Stream {
     $this->Close();
   }
 
+  public function KillProcesses($pid) {
+    posix_kill($pid, @constant('SIGSTOP') ?: 17);
+    $output = [];
+    exec('ps -axo ppid,pid', $output);
+    $pids = [$pid];
+    foreach ($output as $line) {
+      $line = explode(' ', trim(preg_replace('%\s+%', ' ', $line)), 2);
+      if (count($line) != 2) continue;
+      if (intval($line[0]) == $pid) {
+        $this->KillProcesses(intval($line[1]));
+      }
+    }
+    posix_kill($pid, @constant('SIGTERM') ?: 15);
+    posix_kill($pid, @constant('SIGCONT') ?: 19);
+  }
+
   public function Kill() {
     if (is_null($this->process)) return;
     for ($i = 0; $i < 10; $i++) {
       $status = proc_get_status($this->process);
       if (!$status['running']) return;
       if ($i == 0) {
-        posix_kill($status['pid'], @constant('SIGTERM') ?: 15);
+        $this->KillProcesses($status['pid']);
       }
       usleep(1000 << $i);
     }
