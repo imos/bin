@@ -93,7 +93,7 @@ class NineStream {
 
   public function Start() {
     global $CONFIG;
-    $this->streams = [-1 => new Stream(NULL)];
+    $this->streams = [-2 => new Stream(NULL)];
     if (getenv('NINESTREAM_INIT') !== FALSE) {
       $init_commands = trim(file_get_contents(getenv('NINESTREAM_INIT')));
       foreach (explode("\n", $init_commands) as $command) {
@@ -101,8 +101,8 @@ class NineStream {
       }
     }
     while (TRUE) {
-      $stdin = $this->streams[-1]->stdout;
-      $stdout = $this->streams[-1]->stdin;
+      $stdin = $this->streams[-2]->stdout;
+      $stdout = $this->streams[-2]->stdin;
       if (@posix_isatty($stdin) && @posix_isatty($stdout)) {
         fwrite(STDOUT, '> ');
         fflush(STDOUT);
@@ -117,8 +117,8 @@ class NineStream {
       }
       $buffer = rtrim($buffer, "\r\n");
       if ($stdout != STDOUT && boolval($CONFIG['controller.debug'])) {
-        fwrite(STDOUT, "> $buffer\n");
-        fflush(STDOUT);
+        fwrite(STDERR, "> $buffer\n");
+        fflush(STDERR);
       }
       if (preg_match('%^exit(?:| (\d+))$%', $buffer, $match)) {
         exit(isset($match[1]) ? intval($match[1]) : 0);
@@ -131,12 +131,12 @@ class NineStream {
       $result = strtr($this->Command($buffer), ["\r" => '', "\n" => '']);
       fwrite($stdout, "$result\n");
       fflush($stdout);
-      if (isset($this->streams[-2])) {
-        unset($this->streams[-2]);
+      if (isset($this->streams[-3])) {
+        unset($this->streams[-3]);
       }
       if ($stdout != STDOUT && boolval($CONFIG['controller.debug'])) {
-        fwrite(STDOUT, "$result\n");
-        fflush(STDOUT);
+        fwrite(STDERR, "$result\n");
+        fflush(STDERR);
       }
     }
   }
@@ -216,8 +216,11 @@ class NineStream {
           return 'BAD_REQUEST run requires 1+ arguments, but ' .
                  count($args) . '.';
         }
-        $this->streams[-2] = $this->streams[-1];
-        $this->streams[-1] = new Stream(implode(' ', $args));
+        if (!isset($this->streams[-1])) {
+          $this->streams[-1] = new Stream(NULL);
+        }
+        $this->streams[-3] = $this->streams[-2];
+        $this->streams[-2] = new Stream(implode(' ', $args));
         return 'OK';
       case 'stream':
         $streams = ['OK'];
@@ -243,7 +246,7 @@ class NineStream {
         while (TRUE) {
           $reads = [];
           foreach ($this->streams as $stream_id => $stream) {
-            if ($stream_id < 0) continue;
+            if ($stream_id < -1) continue;
             $reads[] = $stream->stdout;
           }
           if (count($reads) == 0) {
@@ -282,7 +285,7 @@ class NineStream {
                   count($args) . '.';
         }
         $stream_id = array_shift($args);
-        if (!preg_match('%^\d{0,6}$%', $stream_id)) {
+        if (!preg_match('%^-?\d{0,6}$%', $stream_id)) {
           return 'BAD_REQUEST write\'s first argument must be an integer, ' .
                  "but $stream_id.";
         }
