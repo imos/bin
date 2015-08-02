@@ -164,6 +164,7 @@ class NineStream {
     }
     $args = explode(' ', $command);
     $command = array_shift($args);
+    $buffer = '';
     switch (strtolower($command)) {
       case 'help':
         $commands = ['set', 'get', 'config', 'run', 'exec',
