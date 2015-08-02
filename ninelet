@@ -7,6 +7,7 @@
 source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
 DEFINE_bool debug false 'Enables debug mode.'
 DEFINE_bool tty false 'Enables tty.'
+DEFINE_string ninelet '' 'Ninelet target.'
 DEFINE_string ninelet_list \
     'http://ninecluster.s3-website-ap-northeast-1.amazonaws.com/ninelet.txt' \
     'URL containing a list of ninelet ports.'
@@ -27,10 +28,19 @@ run() {
   local timeout="$(( SECONDS + 10 ))"
   local targets=()
   local host='' port=''
-  while IFS=: read host port; do
+  if [ "${FLAGS_ninelet}" == '' ]; then
+    while IFS=: read host port; do
+      targets+=("${RANDOM}:-p ${port} ninelet@${host}")
+    done < <(curl --silent "${FLAGS_ninelet_list}")
+    func::sort targets
+  else
+    host="${FLAGS_ninelet%:*}"
+    port="${FLAGS_ninelet##*:}"
+    if [ "${port}" == "${FLAGS_ninelet}" ]; then
+      port=2210
+    fi
     targets+=("${RANDOM}:-p ${port} ninelet@${host}")
-  done < <(curl --silent "${FLAGS_ninelet_list}")
-  func::sort targets
+  fi
   local target=''
   for target in "${targets[@]}"; do
     target="${target#*:}"
