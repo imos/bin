@@ -9,7 +9,7 @@ DEFINE_bool debug false 'Enables debug mode.'
 DEFINE_bool tty false 'Enables tty.'
 DEFINE_string ninelet '' 'Ninelet target.'
 DEFINE_string ninelet_list \
-    'http://imoz.jp/data/ninecluster/ninelet.txt' \
+    'http://imoz.jp/data/ninecluster/ninecluster.txt' \
     'URL containing a list of ninelet ports.'
 IMOSH_PREDICATE=1 eval "${IMOSH_INIT}"
 
