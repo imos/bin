@@ -1,0 +1,28 @@
+#!/bin/bash
+# imos-lock is a lock script.
+#
+# Usage:
+#     imos-lock key
+
+source "$(dirname "${BASH_SOURCE}")"/imos-variables || exit 1
+DEFINE_string endpoint 'http://lock.imoz.jp/lock' 'End point of a lock service.'
+eval "${IMOSH_INIT}"
+
+if [ "${#}" -ne 1 ]; then
+  LOG FATAL "imos-lock requires no arguments."
+fi
+KEY="${1}"
+OWNER="$(whoami)@$(hostname):$$.${RANDOM}"
+LOG INFO "Locking ${KEY} as ${OWNER}..."
+
+lock() {
+  "${FLAGS_endpoint}?key=${KEY}&owner=${OWNER}&duration=10"
+}
+
+main() {
+  "${KEY}"
+  check
+  "start::$(sub::strtolower "${UNAME}")"
+}
+
+main
