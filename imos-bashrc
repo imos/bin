@@ -57,7 +57,7 @@ __bashrc::init() {
   fi
   shopt -u histappend
   export HISTSIZE=999999
-  export HISTCONTROL=ignoreboth
+  export HISTCONTROL=ignorespace
 }
 
 __bashrc::init
