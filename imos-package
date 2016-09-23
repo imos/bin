@@ -116,7 +116,9 @@ create_tar() {
       kill "${tar_pid}" 2>/dev/null || true
       local file_size="$(wc -c < "${1}")"
       if (( file_size > FLAGS_file_size )); then
-        LOG FATAL "File size is too big: --file_size=${FLAGS_file_size}"
+        ls -lAR . >&2
+        LOG FATAL "File size ($file_size bytes) is bigger than limit:" \
+                  "--file_size=${FLAGS_file_size}"
       fi
     fi
     popd >/dev/null
@@ -129,7 +131,7 @@ archive_tar() {
   if [ "$#" -eq 2 ]; then
     local command='#!/bin/bash
 set -e -u
-package_directory="${TMPDIR}/package.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}/package"
+package_directory="${TMPDIR:-/tmp}/package.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}/package"
 mkdir -p "${package_directory}"
 cat "${BASH_SOURCE}" | tail -n +NUM_OF_LINES | {
   pushd "${package_directory}" >/dev/null
