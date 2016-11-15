@@ -93,7 +93,7 @@ pokemon::linux() {
   case "$(hostname -i)" in
     '153.121.64.206')
       sub::println 'Dunsparce';;
-    172.17.*)
+    172.*)
       # Docker container should be Unown.
       sub::println 'Unown';;
     *)
