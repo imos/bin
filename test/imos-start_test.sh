@@ -10,7 +10,7 @@ test::imos-start::darwin() {
   sub::print 'PASSW0RD' > "${IMOS_ROOT}/usr/imos/config/installed-password"
   UNAME=Darwin run
   EXPECT_TRUE [ ! -L "${IMOS_ROOT}/Users/Guest/Pictures" ]
-  EXPECT_EQ "${IMOS_ROOT}/storage/home/foo/Pictures" \
+  EXPECT_EQ "${IMOS_ROOT}/Volumes/Arceus/Users/foo/Pictures" \
             "$(readlink "${IMOS_ROOT}/Users/foo/Pictures")"
   EXPECT_EQ 'hoge' "$(cat "${IMOS_ROOT}/foo/bar")"
 }

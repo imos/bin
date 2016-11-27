@@ -34,7 +34,7 @@ start::darwin() {
         if [ ! -L "${IMOS_ROOT}/Users/${user}/Pictures" ]; then
           LOG INFO "Replacing ${user}'s Pictures directory..."
           rm -R -f "${IMOS_ROOT}/Users/${user}/Pictures"
-          ln -s "${IMOS_ROOT}/storage/home/${user}/Pictures" \
+          ln -s "${IMOS_ROOT}/Volumes/Arceus/Users/${user}/Pictures" \
                 "${IMOS_ROOT}/Users/${user}/Pictures"
         fi
       done
