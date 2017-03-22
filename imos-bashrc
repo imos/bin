@@ -63,7 +63,7 @@ __bashrc::init() {
 __bashrc::init
 
 export GOPATH="${HOME}/go"
-export PATH="${PATH}:/usr/local/opt/go/libexec/bin:${GOPATH}/bin"
+export PATH="${PATH}:/usr/local/opt/go/libexec/bin:${GOPATH}/bin:${HOME}/.cargo/bin"
 
 if [ -f ~/google-cloud-sdk/path.bash.inc ]; then
   source ~/google-cloud-sdk/path.bash.inc
