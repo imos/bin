@@ -71,3 +71,6 @@ fi
 if [ -f ~/google-cloud-sdk/completion.bash.inc ]; then
   source ~/google-cloud-sdk/completion.bash.inc
 fi
+if [ -f ~/.cargo/env ]; then
+  source ~/.cargo/env
+fi
