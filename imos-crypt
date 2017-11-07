@@ -24,7 +24,7 @@ get_password() {
     return
   fi
   if (( FLAGS_installed_password )); then
-    local password_file="${IMOS_ROOT}/usr/imos/config/installed-password"
+    local password_file="${IMOS_ROOT}/usr/local/imos/config/installed-password"
     mkdir -p "$(dirname "${password_file}")"
     if [ ! -f "${password_file}" ]; then
       if [ "$(whoami)" != 'root' ]; then

@@ -119,7 +119,7 @@ imos-install::darwin() {
     esac
   done
   popd >/dev/null
-  backup_and_move "${IMOS_ROOT}/var/vm" "${IMOS_STORAGE}/cache/var/vm"
+  # backup_and_move "${IMOS_ROOT}/var/vm" "${IMOS_STORAGE}/cache/var/vm"
   backup_and_move "${IMOS_ROOT}/Library/Caches" \
                   "${IMOS_STORAGE}/cache/Library/Caches"
   register_launchdaemons
