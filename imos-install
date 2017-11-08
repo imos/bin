@@ -98,7 +98,7 @@ imos-install::darwin() {
       Guest|Shared|provision|ninetan) :;;
       *)
         local owner="$(imos-stat --format='%u:%g' "${user}")"
-        local storage_home="${IMOS_STORAGE}/home/${user}"
+        local storage_home="${IMOS_STORAGE}/Users/${user}"
         mkdir -p "${storage_home}"
         chown "${owner}" "${storage_home}"
         chmod 755 "${storage_home}"
