@@ -68,7 +68,7 @@ start::darwin() {
           cut -f2 -d'"'
       )"
       LOG INFO "Unmounting ${volume} (/dev/${disk})..."
-      diskutil unmountDisk "/dev/${disk}"
+      diskutil unmountDisk force "/dev/${disk}"
     fi
   done
 }
