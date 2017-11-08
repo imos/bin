@@ -64,7 +64,6 @@ __bashrc::init
 
 export GOPATH="${HOME}/go"
 export PATH="${PATH}:/usr/local/opt/go/libexec/bin:${GOPATH}/bin:${HOME}/.cargo/bin"
-export PATH="${HOME}/bin:${PATH}"
 
 if [ -f ~/google-cloud-sdk/path.bash.inc ]; then
   source ~/google-cloud-sdk/path.bash.inc
@@ -79,4 +78,10 @@ for bashrc in /usr/local/imos/bashrc/*.sh; do
 done
 if [ -f ~/.cargo/env ]; then
   source ~/.cargo/env
+fi
+
+export PATH="${HOME}/bin:${PATH}"
+
+if [ -d /usr/local/rustc/src ]; then
+  export RUST_SRC_PATH=/usr/local/rustc/src
 fi
