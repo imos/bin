@@ -4,7 +4,7 @@ bin directory used by imos.
 This repository is tested on drone.io (https://drone.io/github.com/imos/bin).
 
 ## How to Install/Update
-Install this repository to /usr/imos/bin and configure ${PATH}:
+Install this repository to /usr/local/imos/bin and configure ${PATH}:
 ```sh
 curl https://raw.githubusercontent.com/imos/bin/master/tool/setup | sudo bash
 ```
@@ -141,7 +141,7 @@ imos-bashrc initializes PS1 and sources init files.
 
 ### Usage
 ```sh
-source /usr/imos/bin/imos-bashrc
+source /usr/local/imos/bin/imos-bashrc
 ```
 
 -----

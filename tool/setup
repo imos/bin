@@ -3,13 +3,13 @@
 set -e -u
 
 update_profile() {
-  grep -v 'usr/imos/bin' '/etc/profile' > '/tmp/profile'
-  echo 'if [[ ! "${PATH}" =~ (:|^)'\''/usr/imos/bin'\''(:|$) ]]; then export PATH="/usr/imos/bin:${PATH}"; fi' >> '/tmp/profile'
+  grep -v 'usr/local/imos/bin' '/etc/profile' > '/tmp/profile'
+  echo 'if [[ ! "${PATH}" =~ (:|^)'\''/usr/local/imos/bin'\''(:|$) ]]; then export PATH="/usr/local/imos/bin:${PATH}"; fi' >> '/tmp/profile'
   cat '/tmp/profile' > '/etc/profile'
 }
 
 setup_for_mac() {
-  echo '/usr/imos/bin' > '/etc/paths.d/imos-bin'
+  echo '/usr/local/imos/bin' > '/etc/paths.d/imos-bin'
   update_profile
 }
 
@@ -45,9 +45,9 @@ case "${OS}" in
     ;;
 esac
 
-if [ -d '/usr/imos/bin' ]; then
-  rm -r '/usr/imos/bin'
+if [ -d '/usr/local/imos/bin' ]; then
+  rm -r '/usr/local/imos/bin'
 fi
-mkdir -p '/usr/imos/bin'
-git clone --depth 1 'https://github.com/imos/bin' '/usr/imos/bin'
+mkdir -p '/usr/local/imos/bin'
+git clone --depth 1 'https://github.com/imos/bin' '/usr/local/imos/bin'
 

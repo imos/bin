@@ -1,5 +1,5 @@
 if [ -f ~/bin/imos-bashrc ]; then
   source ~/bin/imos-bashrc
-elif [ -f /usr/imos/bin/imos-bashrc ]; then
-  source /usr/imos/bin/imos-bashrc
+elif [ -f /usr/local/imos/bin/imos-bashrc ]; then
+  source /usr/local/imos/bin/imos-bashrc
 fi

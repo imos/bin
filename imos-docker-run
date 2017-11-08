@@ -18,10 +18,10 @@ rebuild() {
 FROM ubuntu:14.04
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update -qq && apt-get -y install git man
-RUN mkdir -p /usr/imos
+RUN mkdir -p /usr/local/imos
 RUN echo $(date)
-RUN git clone https://github.com/imos/bin /usr/imos/bin
-RUN echo 'source /usr/imos/bin/data/bashrc' >'/root/.bash_aliases'
+RUN git clone https://github.com/imos/bin /usr/local/imos/bin
+RUN echo 'source /usr/local/imos/bin/data/bashrc' >'/root/.bash_aliases'
 EOM
   docker build --tag="${FLAGS_container}" "${TMPDIR}"
 }
