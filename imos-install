@@ -123,6 +123,13 @@ imos-install::darwin() {
   backup_and_move "${IMOS_ROOT}/Library/Caches" \
                   "${IMOS_STORAGE}/cache/Library/Caches"
   register_launchdaemons
+
+  LOG INFO 'Installing Homebrew API token...'
+  rm -rf /usr/local/imos/bashrc
+  mkdir -p /usr/local/imos/bashrc
+  imos-crypt --installed_password --decrypt \
+      "${IMOS_BIN}/data/homebrew-api-token.sh.aes256" \
+      "${IMOS_ROOT}/usr/local/imos/bashrc/homebrew-api-token.sh"
 }
 
 imos-install::linux() {
