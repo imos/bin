@@ -56,19 +56,21 @@ start::darwin() {
       done
       popd > '/dev/null'
     fi
-
-    for volume in /Volumes/*; do
-      if [ -d "${volume}/Applications" -a ! -L "${volume}" ]; then
-        local disk="$(
-            diskutil list -plist "$volume" |
-            plutil -convert json -o - - |
-            plutil -extract WholeDisks json -o - - |
-            cut -f2 -d'"'
-        )"
-        diskutil unmountDisk "/dev/${disk}"
-      fi
-    done
   fi
+
+  LOG INFO 'Unmounting non-root bootable disk devices...'
+  for volume in /Volumes/*; do
+    if [ -d "${volume}/Applications" -a ! -L "${volume}" ]; then
+      local disk="$(
+          diskutil list -plist "$volume" |
+          plutil -convert json -o - - |
+          plutil -extract WholeDisks json -o - - |
+          cut -f2 -d'"'
+      )"
+      LOG INFO "Unmounting ${volume} (/dev/${disk})..."
+      diskutil unmountDisk "/dev/${disk}"
+    fi
+  done
 }
 
 start::linux() {

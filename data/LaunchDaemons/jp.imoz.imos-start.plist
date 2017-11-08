@@ -17,6 +17,7 @@
 	<array>
 		<string>/bin/bash</string>
 		<string>/usr/local/imos/bin/imos-start</string>
+		<string>--alsologtostderr</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
