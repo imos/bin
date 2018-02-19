@@ -80,3 +80,7 @@ done
 if [ -f ~/.cargo/env ]; then
   source ~/.cargo/env
 fi
+
+if [ -d /usr/local/rustc/src ]; then
+  export RUST_SRC_PATH=/usr/local/rustc/src
+fi

@@ -34,7 +34,7 @@ start::darwin() {
         if [ ! -L "${IMOS_ROOT}/Users/${user}/Pictures" ]; then
           LOG INFO "Replacing ${user}'s Pictures directory..."
           rm -R -f "${IMOS_ROOT}/Users/${user}/Pictures"
-          ln -s "${IMOS_ROOT}/Volumes/Arceus/Users/${user}/Pictures" \
+          ln -s "${IMOS_ROOT}/Users/${user}/${POKEMON}/Pictures" \
                 "${IMOS_ROOT}/Users/${user}/Pictures"
         fi
       done
@@ -57,20 +57,6 @@ start::darwin() {
       popd > '/dev/null'
     fi
   fi
-
-  LOG INFO 'Unmounting non-root bootable disk devices...'
-  for volume in /Volumes/*; do
-    if [ -d "${volume}/Applications" -a ! -L "${volume}" ]; then
-      local disk="$(
-          diskutil list -plist "$volume" |
-          plutil -convert json -o - - |
-          plutil -extract WholeDisks json -o - - |
-          cut -f2 -d'"'
-      )"
-      LOG INFO "Unmounting ${volume} (/dev/${disk})..."
-      diskutil unmountDisk force "/dev/${disk}"
-    fi
-  done
 }
 
 start::linux() {
